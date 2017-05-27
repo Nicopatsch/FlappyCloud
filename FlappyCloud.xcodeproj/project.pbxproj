@@ -65,8 +65,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		455C4C9C1ED83FF300271814 /* Flappy Cloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Flappy Cloud.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		455C4CA01ED83FF300271814 /* Flappy Cloud-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Flappy Cloud-Info.plist"; sourceTree = "<group>"; };
+		455C4C9C1ED83FF300271814 /* FlappyCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlappyCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		455C4CA01ED83FF300271814 /* FlappyCloud-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FlappyCloud-Info.plist"; sourceTree = "<group>"; };
 		455C4CA11ED83FF300271814 /* ResourcePath.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ResourcePath.mm; sourceTree = "<group>"; };
 		455C4CA31ED83FF300271814 /* ResourcePath.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ResourcePath.hpp; sourceTree = "<group>"; };
 		455C4CA41ED83FF300271814 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -188,7 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				45F2686E1ED84FA800372566 /* Box2D */,
-				455C4C9E1ED83FF300271814 /* Flappy Cloud */,
+				455C4C9E1ED83FF300271814 /* FlappyCloud */,
 				455C4C9D1ED83FF300271814 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -196,12 +196,12 @@
 		455C4C9D1ED83FF300271814 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				455C4C9C1ED83FF300271814 /* Flappy Cloud.app */,
+				455C4C9C1ED83FF300271814 /* FlappyCloud.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		455C4C9E1ED83FF300271814 /* Flappy Cloud */ = {
+		455C4C9E1ED83FF300271814 /* FlappyCloud */ = {
 			isa = PBXGroup;
 			children = (
 				455C4CA11ED83FF300271814 /* ResourcePath.mm */,
@@ -212,13 +212,14 @@
 				455C4CA61ED83FF300271814 /* Resources */,
 				455C4C9F1ED83FF300271814 /* Supporting Files */,
 			);
+			name = FlappyCloud;
 			path = "Flappy Cloud";
 			sourceTree = "<group>";
 		};
 		455C4C9F1ED83FF300271814 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				455C4CA01ED83FF300271814 /* Flappy Cloud-Info.plist */,
+				455C4CA01ED83FF300271814 /* FlappyCloud-Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -395,9 +396,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		455C4C9B1ED83FF300271814 /* Flappy Cloud */ = {
+		455C4C9B1ED83FF300271814 /* FlappyCloud */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 455C4CB11ED83FF300271814 /* Build configuration list for PBXNativeTarget "Flappy Cloud" */;
+			buildConfigurationList = 455C4CB11ED83FF300271814 /* Build configuration list for PBXNativeTarget "FlappyCloud" */;
 			buildPhases = (
 				455C4C971ED83FF300271814 /* Sources */,
 				455C4C981ED83FF300271814 /* Frameworks */,
@@ -408,9 +409,9 @@
 			);
 			dependencies = (
 			);
-			name = "Flappy Cloud";
+			name = FlappyCloud;
 			productName = "Flappy Cloud";
-			productReference = 455C4C9C1ED83FF300271814 /* Flappy Cloud.app */;
+			productReference = 455C4C9C1ED83FF300271814 /* FlappyCloud.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -428,7 +429,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 455C4C961ED83FF300271814 /* Build configuration list for PBXProject "Flappy Cloud" */;
+			buildConfigurationList = 455C4C961ED83FF300271814 /* Build configuration list for PBXProject "FlappyCloud" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -440,7 +441,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				455C4C9B1ED83FF300271814 /* Flappy Cloud */,
+				455C4C9B1ED83FF300271814 /* FlappyCloud */,
 			);
 		};
 /* End PBXProject section */
@@ -633,7 +634,7 @@
 					"$[PROJECT_DIR]/**",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "Flappy Cloud/Flappy Cloud-Info.plist";
+				INFOPLIST_FILE = "Flappy Cloud/FlappyCloud-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -647,7 +648,7 @@
 					"$[PROJECT_DIR]/**",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "Flappy Cloud/Flappy Cloud-Info.plist";
+				INFOPLIST_FILE = "Flappy Cloud/FlappyCloud-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -656,7 +657,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		455C4C961ED83FF300271814 /* Build configuration list for PBXProject "Flappy Cloud" */ = {
+		455C4C961ED83FF300271814 /* Build configuration list for PBXProject "FlappyCloud" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				455C4CAF1ED83FF300271814 /* Debug */,
@@ -665,7 +666,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		455C4CB11ED83FF300271814 /* Build configuration list for PBXNativeTarget "Flappy Cloud" */ = {
+		455C4CB11ED83FF300271814 /* Build configuration list for PBXNativeTarget "FlappyCloud" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				455C4CB21ED83FF300271814 /* Debug */,

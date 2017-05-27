@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:Flappy Cloud.xcodeproj">
+      location = "self:/Users/olivier/Documents/Xcode Projects/FlappyCloud/FlappyCloud.xcodeproj">
    </FileRef>
 </Workspace>
