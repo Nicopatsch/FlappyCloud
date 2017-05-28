@@ -9,10 +9,9 @@
 /* Begin PBXBuildFile section */
 		455C4CA21ED83FF300271814 /* ResourcePath.mm in Sources */ = {isa = PBXBuildFile; fileRef = 455C4CA11ED83FF300271814 /* ResourcePath.mm */; };
 		455C4CA51ED83FF300271814 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 455C4CA41ED83FF300271814 /* main.cpp */; };
-		455C4CA81ED83FF300271814 /* cute_image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 455C4CA71ED83FF300271814 /* cute_image.jpg */; };
-		455C4CAA1ED83FF300271814 /* nice_music.ogg in Resources */ = {isa = PBXBuildFile; fileRef = 455C4CA91ED83FF300271814 /* nice_music.ogg */; };
 		455C4CAC1ED83FF300271814 /* sansation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 455C4CAB1ED83FF300271814 /* sansation.ttf */; };
 		455C4CAE1ED83FF300271814 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 455C4CAD1ED83FF300271814 /* icon.png */; };
+		4579EE2C1EDB46BC009BDB15 /* cloud.png in Resources */ = {isa = PBXBuildFile; fileRef = 4579EE2B1EDB46BC009BDB15 /* cloud.png */; };
 		45F268D31ED84FA900372566 /* b2BroadPhase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 45F268711ED84FA800372566 /* b2BroadPhase.cpp */; };
 		45F268D41ED84FA900372566 /* b2CollideCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 45F268731ED84FA800372566 /* b2CollideCircle.cpp */; };
 		45F268D51ED84FA900372566 /* b2CollideEdge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 45F268741ED84FA800372566 /* b2CollideEdge.cpp */; };
@@ -70,10 +69,9 @@
 		455C4CA11ED83FF300271814 /* ResourcePath.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ResourcePath.mm; sourceTree = "<group>"; };
 		455C4CA31ED83FF300271814 /* ResourcePath.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ResourcePath.hpp; sourceTree = "<group>"; };
 		455C4CA41ED83FF300271814 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		455C4CA71ED83FF300271814 /* cute_image.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = cute_image.jpg; sourceTree = "<group>"; };
-		455C4CA91ED83FF300271814 /* nice_music.ogg */ = {isa = PBXFileReference; lastKnownFileType = file; path = nice_music.ogg; sourceTree = "<group>"; };
 		455C4CAB1ED83FF300271814 /* sansation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sansation.ttf; sourceTree = "<group>"; };
 		455C4CAD1ED83FF300271814 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		4579EE2B1EDB46BC009BDB15 /* cloud.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloud.png; sourceTree = "<group>"; };
 		45F2686F1ED84FA800372566 /* Box2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2D.h; sourceTree = "<group>"; };
 		45F268711ED84FA800372566 /* b2BroadPhase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2BroadPhase.cpp; sourceTree = "<group>"; };
 		45F268721ED84FA800372566 /* b2BroadPhase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2BroadPhase.h; sourceTree = "<group>"; };
@@ -228,8 +226,7 @@
 			isa = PBXGroup;
 			children = (
 				45F269011ED8500700372566 /* box.png */,
-				455C4CA71ED83FF300271814 /* cute_image.jpg */,
-				455C4CA91ED83FF300271814 /* nice_music.ogg */,
+				4579EE2B1EDB46BC009BDB15 /* cloud.png */,
 				45F269031ED8501000372566 /* ground.png */,
 				455C4CAB1ED83FF300271814 /* sansation.ttf */,
 				455C4CAD1ED83FF300271814 /* icon.png */,
@@ -453,10 +450,9 @@
 			files = (
 				45F269041ED8501000372566 /* ground.png in Resources */,
 				455C4CAE1ED83FF300271814 /* icon.png in Resources */,
+				4579EE2C1EDB46BC009BDB15 /* cloud.png in Resources */,
 				455C4CAC1ED83FF300271814 /* sansation.ttf in Resources */,
 				45F269021ED8500700372566 /* box.png in Resources */,
-				455C4CAA1ED83FF300271814 /* nice_music.ogg in Resources */,
-				455C4CA81ED83FF300271814 /* cute_image.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

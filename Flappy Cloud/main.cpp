@@ -1,49 +1,34 @@
-
-//
-// Disclaimer:
-// ----------
-//
-// This code will work only if you selected window, graphics and audio.
-//
-// Note that the "Run Script" build phase will copy the required frameworks
-// or dylibs to your application bundle so you can execute it on any OS X
-// computer.
-//
-// Your resource files (images, sounds, fonts, ...) are also copied to your
-// application bundle. To get the path to these resources, use the helper
-// function `resourcePath()` from ResourcePath.hpp
-//
-
-#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
-//#include "cloud.cpp"
 
 
 // Here is a small helper for you! Have a look.
 #include "ResourcePath.hpp"
 #include "cloud.cpp"
 
+using namespace std;
 
 
 void createGround(b2World& world, float X, float Y);
-void createBox(b2World& world, int mouseX, int mouseY); // Spawns a box at MouseX, MouseY
+b2Body* createCloud(b2World& world); // Spawns a box at MouseX, MouseY
+void cloudJump(b2Body* cloud);
 
 
 int main(int, char const**)
 {
     
     /** Prepare the world */
-    b2Vec2 gravity(0.f, 9.8f);
+    b2Vec2 gravity(0.f, 3.f);
     b2World world(gravity);
     createGround(world, 400.f, 500.f);
-    //Cloud cloud0 = Cloud(world);
+    b2Body* cloud = createCloud(world);
     
     sf::Texture groundTexture;
     sf::Texture boxTexture;
+    sf::Texture cloudTexture;
     groundTexture.loadFromFile(resourcePath() + "ground.png");
     boxTexture.loadFromFile(resourcePath() + "box.png");
-    
+    cloudTexture.loadFromFile(resourcePath() + "cloud.png");
     
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
@@ -71,12 +56,15 @@ int main(int, char const**)
                 window.close();
             }
             
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
+                cloudJump(cloud);
+                //                cloud->SetLinearVelocity(b2Vec2(0,-5));
+            }
+            
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
                 int mouseX = sf::Mouse::getPosition(window).x;
                 int mouseY = sf::Mouse::getPosition(window).y;
-                //Cloud cloud(world); -->en comm car ne marche pas...
-                createBox(world, mouseX, mouseY);
                 
             }
         }
@@ -93,7 +81,7 @@ int main(int, char const**)
             if (bodyIterator->GetType() == b2_dynamicBody)
             {
                 sf::Sprite sprite;
-                sprite.setTexture(boxTexture);
+                sprite.setTexture(cloudTexture);
                 sprite.setOrigin(16.f, 16.f);
                 sprite.setPosition(SCALE * bodyIterator->GetPosition().x, SCALE * bodyIterator->GetPosition().y);
                 sprite.setRotation(bodyIterator->GetAngle() * 180/b2_pi);
@@ -109,9 +97,6 @@ int main(int, char const**)
                 window.draw(groundSprite);
             }
         }
-        
-        
-        
         // Update the window
         window.display();
     }
@@ -137,20 +122,26 @@ void createGround(b2World& world, float X, float Y)
     
 }
 
+void cloudJump(b2Body* cloud) {
+    cloud->SetLinearVelocity(b2Vec2(0,-5));
+}
 
-void createBox(b2World& world, int mouseX, int mouseY)
+
+b2Body* createCloud(b2World& world)
 {
     b2BodyDef bodyDef;
-    bodyDef.position = b2Vec2(mouseX/SCALE, mouseY/SCALE);
+    bodyDef.position = b2Vec2(10, 10);
     bodyDef.type = b2_dynamicBody;
     b2Body* body = world.CreateBody(&bodyDef);
     
     b2PolygonShape shape;
-    shape.SetAsBox((32.f/2)/SCALE, (32.f/2)/SCALE);
+    shape.SetAsBox((100.f/2)/SCALE, (67.f/2)/SCALE);
+    //    shape.SetAsBox((80.f)/SCALE, (53.5f)/SCALE);
     b2FixtureDef fixtureDef;
     fixtureDef.density = 1.f;
     fixtureDef.friction = 0.7f;
+    fixtureDef.restitution = 0.1f;
     fixtureDef.shape = &shape;
     body->CreateFixture(&fixtureDef);
+    return body;
 }
-
