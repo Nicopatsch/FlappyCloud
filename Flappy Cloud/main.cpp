@@ -19,7 +19,8 @@ void loadVariables();
 
 static float gravityX;
 static float gravityY;
-static float velocityY = -5.0;
+static float velocityY = -5;
+static float velocityX;
 
 int main(int, char const**)
 {
@@ -162,11 +163,13 @@ b2Body* createCloud(b2World& world)
 void loadVariables() {
     pugi::xml_document doc;
     
-    if (!doc.load_file("/Users/nicopatsch/FlappyCloud/Flappy Cloud/parameters.xml")) cout << "Failed loading file" << endl;
+    if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/parameters.xml")) cout << "Failed loading file" << endl;
     
-    pugi::xml_node gravityNode = doc.child("Parameters").child("Gravity");
+    pugi::xml_node parameters = doc.child("Parameters");
     
     cout << "Gravity: " << doc.child("Parameters").child("Gravity").attribute("GravityX").value() << " ; " << doc.child("Parameters").child("Gravity").attribute("GravityY").value() << endl;
-    gravityX = stof(gravityNode.attribute("GravityX").value());
-    gravityY = stof(gravityNode.attribute("GravityY").value());
+    gravityX=stof(parameters.child("Gravity").attribute("GravityX").value());
+    gravityY=stof(parameters.child("Gravity").attribute("GravityY").value());
+    velocityX=stof(parameters.child("Velocity").attribute("VelocityX").value());
+    velocityY=stof(parameters.child("Velocity").attribute("VelocityY").value());
 }
