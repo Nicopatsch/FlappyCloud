@@ -5,20 +5,27 @@
 // Here is a small helper for you! Have a look.
 #include "ResourcePath.hpp"
 #include "cloud.cpp"
+#include "pugixml.hpp"
+#include "pugiconfig.hpp"
 
 using namespace std;
+using namespace pugi;
 
 
 void createGround(b2World& world, float X, float Y);
 b2Body* createCloud(b2World& world); // Spawns a box at MouseX, MouseY
 void cloudJump(b2Body* cloud);
+void loadVariables();
 
+static float gravityX;
+static float gravityY;
 
 int main(int, char const**)
 {
+    loadVariables();
     
     /** Prepare the world */
-    b2Vec2 gravity(0.f, 3.f);
+    b2Vec2 gravity(gravityX, gravityY);
     b2World world(gravity);
     createGround(world, 400.f, 500.f);
     b2Body* cloud = createCloud(world);
@@ -58,7 +65,12 @@ int main(int, char const**)
             
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
                 cloudJump(cloud);
-                //                cloud->SetLinearVelocity(b2Vec2(0,-5));
+            }
+            
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return) {
+                loadVariables();
+                b2Vec2 gravity(gravityX, gravityY);
+                world.SetGravity(gravity);
             }
             
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -144,4 +156,16 @@ b2Body* createCloud(b2World& world)
     fixtureDef.shape = &shape;
     body->CreateFixture(&fixtureDef);
     return body;
+}
+
+void loadVariables() {
+    pugi::xml_document doc;
+    
+    if (!doc.load_file("/Users/nicopatsch/FlappyCloud/Flappy Cloud/parameters.xml")) cout << "Failed loading file" << endl;
+    
+    pugi::xml_node gravityNode = doc.child("Parameters").child("Gravity");
+    
+    cout << "Gravity: " << doc.child("Parameters").child("Gravity").attribute("GravityX").value() << " ; " << doc.child("Parameters").child("Gravity").attribute("GravityY").value() << endl;
+    gravityX = stof(gravityNode.attribute("GravityX").value());
+    gravityY = stof(gravityNode.attribute("GravityY").value());
 }

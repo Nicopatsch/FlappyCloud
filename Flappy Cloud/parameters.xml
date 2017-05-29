@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<Parameters name="parameters_root">
+    <Gravity GravityX="0" GravityY="10.0"/>
+</Parameters>
