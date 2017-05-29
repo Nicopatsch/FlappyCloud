@@ -19,6 +19,7 @@ void loadVariables();
 
 static float gravityX;
 static float gravityY;
+static float velocityY = -5.0;
 
 int main(int, char const**)
 {
@@ -135,7 +136,7 @@ void createGround(b2World& world, float X, float Y)
 }
 
 void cloudJump(b2Body* cloud) {
-    cloud->SetLinearVelocity(b2Vec2(0,-5));
+    cloud->SetLinearVelocity(b2Vec2(0,velocityY));
 }
 
 
