@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <Parameters name="parameters_root">
     <Gravity GravityX="0" GravityY="3.0"/>
-    <Velocity VelocityX="0.0" VelocityY="-5.0"/>
+    <Velocity VelocityX="1.0" VelocityY="-5.0"/>
 </Parameters>
