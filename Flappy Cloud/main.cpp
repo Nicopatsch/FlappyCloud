@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
 #include <vector>
+#include <sstream>
 
 
 // Here is a small helper for you! Have a look.
@@ -12,16 +13,12 @@
 using namespace std;
 using namespace pugi;
 
-
-void createGround(b2World& world, float X, float Y);
-b2Body* createCloud(b2World& world); // Spawns a box at MouseX, MouseY
-void cloudJump(b2Body* cloud);
 void loadVariables();
 
-static float gravityX;
-static float gravityY;
-static float velocityY;
-static float velocityX;
+static float gravityX, gravityY;
+static float velocityY, velocityX;
+static float scoreCoeff;
+static float timeStep, velocityIterations, positionIterations;
 
 enum obstacleType {storm, tornado};
 
@@ -33,11 +30,11 @@ private:
     b2FixtureDef fixtureDef;
     sf::Texture cloudTexture;
     sf::Sprite sprite;
+    string scoreText;
+    stringstream streamScoreText;
+    sf::Font font;
+    sf::Text sfScore;
 public:
-    void jump() {
-        body->SetLinearVelocity(b2Vec2(body->GetLinearVelocity().x,velocityY));
-    }
-    
     Cloud(b2World& world)
     {
         cloudTexture.loadFromFile(resourcePath() + "cloud.png");
@@ -52,6 +49,17 @@ public:
         body->CreateFixture(&fixtureDef);
         body->SetLinearVelocity(b2Vec2(velocityX, 0));
         body->SetFixedRotation(true);
+        
+        //Prepare the sfml score text
+        if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
+            return EXIT_FAILURE;
+        }
+        sfScore = sf::Text(scoreText, font, 50);
+        sfScore.setFillColor(sf::Color::Black);
+    }
+    
+    void jump() {
+        body->SetLinearVelocity(b2Vec2(velocityX,velocityY));
     }
     
     void draw(sf::RenderWindow& window) {
@@ -72,7 +80,21 @@ public:
         body->SetType(b2_staticBody);
         cout << "Cloud dead --> Game over!" <<endl;
     }
+    
+    float getScore() {
+        return round(body->GetPosition().x/scoreCoeff);
+    }
+    
+    void drawScore(sf::RenderWindow& window) {
+        //Re-creating and updating the text in the sfml text object
+        streamScoreText << "Score: " << round(body->GetPosition().x/scoreCoeff) << " points";
+        scoreText = streamScoreText.str();
+        sfScore.setString(scoreText);
+        window.draw(sfScore);
+    }
+
 };
+
 
 
 class Ground {
@@ -88,7 +110,7 @@ public:
         bodyDef.position = b2Vec2(X/SCALE, Y/SCALE);
         bodyDef.type = b2_staticBody;
         body = world.CreateBody(&bodyDef);
-        shape.SetAsBox((800.f/2)/SCALE, (16.f/2)/SCALE);
+        shape.SetAsBox((8000.f/2)/SCALE, (16.f/2)/SCALE);
         fixtureDef.density = 0.f;
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
@@ -158,6 +180,7 @@ public:
     }
 };
 
+
 int main(int, char const**)
 {
     loadVariables();
@@ -173,8 +196,6 @@ int main(int, char const**)
         obstacles.push_back(Tornado(world, (i+0.5)*1000, 400));
     }
     
-    
-    
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
     sf::View view(sf::FloatRect(0, 0, 800, 600));
@@ -185,6 +206,9 @@ int main(int, char const**)
     window.clear();
     
     
+    
+    
+
     
     // Start the game loop
     while (window.isOpen())
@@ -225,15 +249,17 @@ int main(int, char const**)
             }
         }
         
-        world.Step(1/60.f, 8, 3);
+        world.Step(timeStep, velocityIterations, positionIterations);
         
         window.clear(sf::Color::White);
         int bodyCount = 0;
         cloud.draw(window);
         ground.draw(window);
+        cloud.drawScore(window);
         for (auto obs = obstacles.begin() ; obs<obstacles.end(); obs++) {
             obs->draw(window);
         }
+        
         
         
         // Update the window
@@ -271,9 +297,12 @@ void loadVariables() {
     
     pugi::xml_node parameters = doc.child("Parameters");
     
-    cout << "Gravity: " << doc.child("Parameters").child("Gravity").attribute("GravityX").value() << " ; " << doc.child("Parameters").child("Gravity").attribute("GravityY").value() << endl;
     gravityX=stof(parameters.child("Gravity").attribute("GravityX").value());
     gravityY=stof(parameters.child("Gravity").attribute("GravityY").value());
     velocityX=stof(parameters.child("Velocity").attribute("VelocityX").value());
     velocityY=stof(parameters.child("Velocity").attribute("VelocityY").value());
+    scoreCoeff=stof(parameters.child("Score").attribute("ScoreCoeff").value());
+    timeStep=stof(parameters.child("Iterations").attribute("TimeStep").value());
+    velocityIterations=stof(parameters.child("Iterations").attribute("VelocityIterations").value());
+    positionIterations=stof(parameters.child("Iterations").attribute("PositionIterations").value());
 }
