@@ -105,7 +105,7 @@ public:
 };
 
 
-
+static int nbGrounds = 0;
 class Ground {
 private:
     b2BodyDef bodyDef;
@@ -124,15 +124,20 @@ public:
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
         groundTexture.loadFromFile(resourcePath() + "ground.png");
+        nbGrounds++;
     }
     
     Ground() {
-        
+        nbGrounds++;
+    }
+    
+    ~Ground() {
+        nbGrounds--;
     }
     
     void draw(sf::RenderWindow& window) {
         sprite.setTexture(groundTexture);
-        sprite.setOrigin(400.f, 8.f);
+        sprite.setOrigin(blockLength/2, 8.f);
         sprite.setPosition(body->GetPosition().x * SCALE, body->GetPosition().y * SCALE);
         sprite.setRotation(180/b2_pi * body->GetAngle());
         window.draw(sprite);
@@ -140,6 +145,48 @@ public:
 };
 
 
+static int nbCeillings = 0;
+class Ceilling {
+private:
+    b2BodyDef bodyDef;
+    b2Body* body;
+    b2PolygonShape shape;
+    b2FixtureDef fixtureDef;
+    sf::Texture ceillingTexture;
+    sf::Sprite sprite;
+public:
+    Ceilling(b2World& world, float X) {
+        bodyDef.position = b2Vec2(X/SCALE, -13.f/SCALE);
+        bodyDef.type = b2_staticBody;
+        body = world.CreateBody(&bodyDef);
+        shape.SetAsBox((blockLength/2)/SCALE, 6.5f/SCALE);
+        fixtureDef.density = 0.f;
+        fixtureDef.shape = &shape;
+        body->CreateFixture(&fixtureDef);
+        ceillingTexture.loadFromFile(resourcePath() + "ceilling.png");
+        nbCeillings++;
+    }
+    
+    Ceilling() {
+        nbCeillings++;
+    }
+    
+    ~Ceilling() {
+        nbCeillings--;
+    }
+    
+    void draw(sf::RenderWindow& window) {
+        sprite.setTexture(ceillingTexture);
+        sprite.setOrigin(blockLength/2, -13.f);
+        sprite.setPosition(body->GetPosition().x * SCALE, body->GetPosition().y * SCALE);
+        sprite.setRotation(180/b2_pi * body->GetAngle());
+        window.draw(sprite);
+    }
+};
+
+
+
+static int nbObstacles = 0;
 class Obstacle {
 private:
     b2BodyDef bodyDef;
@@ -148,8 +195,10 @@ private:
     b2FixtureDef fixtureDef;
     sf::Texture texture;
     sf::Sprite sprite;
+    obstacleType type;
 public:
     Obstacle(b2World& world, float X, float Y, float width, float height, obstacleType type) {
+        this->type = type;
         bodyDef.position = b2Vec2(X/SCALE, Y/SCALE);
         bodyDef.type = b2_staticBody;
         body = world.CreateBody(&bodyDef);
@@ -164,7 +213,13 @@ public:
             texture.loadFromFile(resourcePath() + "tornado.png");
             sprite.setOrigin(50.f, 74.5f);
         }
+        nbObstacles++;
     }
+    
+    ~Obstacle() {
+        nbObstacles--;
+    }
+
     
     
     void draw(sf::RenderWindow& window) {
@@ -201,14 +256,16 @@ private:
     int N;
     vector<Obstacle> obstacles = vector<Obstacle>();
     Ground ground;
+    Ceilling ceilling;
 public:
     Block(b2World& world, int N){
-        for (int i=0 ; i<5 ; i++) {
-            obstacles.push_back(Storm(world, SCALE*(N*blockLength+i*blockLength/5), 100)); //Storms espacés de 1000m
-            obstacles.push_back(Tornado(world, SCALE*(N*blockLength+(i+0.5)*blockLength/5), 400)); //Tornades espacées de 1000m
+        for (int i=0 ; i<1 ; i++) {
+            obstacles.push_back(Storm(world, N*blockLength+i*blockLength/1, 100)); //Storms espacés de 1000m
+            obstacles.push_back(Tornado(world, N*blockLength+(i+0.5)*blockLength/1, 400));
         }
         this->N = N;
         ground = Ground(world, (N+0.5)*blockLength);
+        ceilling = Ceilling(world, (N+0.5)*blockLength);
         nbBlocks+=1;
     }
     
@@ -217,7 +274,7 @@ public:
     }
     
     ~Block() {
-        ground.~Ground();
+//        ground.~Ground();
 //        for (auto it=obstacles.begin(); it<obstacles.end() ; it++) {
 //            it->~Obstacle();
 //        }
@@ -229,6 +286,7 @@ public:
         for (auto obs = obstacles.begin() ; obs<obstacles.end(); obs++) {
             obs->draw(window);
         }
+        ceilling.draw(window);
     }
     
     float getPosition() {
@@ -253,6 +311,7 @@ int main(int, char const**)
     int N=0;
     
     vector<unique_ptr<Block>> blockPtrs;
+    blockPtrs.push_back(make_unique<Block>(world, N-1));
     blockPtrs.push_back(make_unique<Block>(world, N));
     blockPtrs.push_back(make_unique<Block>(world, N+1));
     
@@ -304,21 +363,18 @@ int main(int, char const**)
         }
         
         
-        window.clear(sf::Color::White);
+        window.clear(sf::Color(119, 185, 246));
         cloud.draw(window);
         cloud.drawScore(window);
         blockPtrs[0]->draw(window);
         blockPtrs[1]->draw(window);
-        if(N!=0) {
             blockPtrs[2]->draw(window);
-        }
         cout << "blockPtrs[1]->getPosition() = " << blockPtrs[1]->getPosition() << ", cloud.getPositionX()*SCALE = " << cloud.getPositionX()*SCALE << endl;
+        cout << "nbBlocks = " << nbBlocks << ", nbGrounds = " << nbGrounds << ", nbObstacles = " << nbObstacles << endl;
         if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPosition()) {
             cout << "Passage à droite" <<endl;
-            if(N!=0) {
                 cout << "Length of blockPtrs : " << blockPtrs.size();
                 blockPtrs.erase(blockPtrs.begin());
-            }
             blockPtrs.push_back(make_unique<Block>(world, N));
             N+=1;
             
