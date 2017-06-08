@@ -2,9 +2,8 @@
 #include <Box2D/Box2D.h>
 #include <vector>
 #include <sstream>
+#include <memory>
 
-
-// Here is a small helper for you! Have a look.
 #include "ResourcePath.hpp"
 #include "cloud.cpp"
 #include "pugixml.hpp"
@@ -19,6 +18,7 @@ static float gravityX, gravityY;
 static float velocityY, velocityX;
 static float scoreCoeff;
 static float timeStep, velocityIterations, positionIterations;
+static float blockLength = 800.f;
 
 enum obstacleType {storm, tornado};
 
@@ -34,6 +34,7 @@ private:
     stringstream streamScoreText;
     sf::Font font;
     sf::Text sfScore;
+    bool dead;
 public:
     Cloud(b2World& world)
     {
@@ -56,6 +57,8 @@ public:
         }
         sfScore = sf::Text(scoreText, font, 50);
         sfScore.setFillColor(sf::Color::Black);
+        
+        dead = false;
     }
     
     void jump() {
@@ -75,10 +78,11 @@ public:
     }
     
     void kill() {
+        dead=true;
         body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), b2_pi);
         body->SetLinearVelocity(b2Vec2(0,0));
         body->SetType(b2_staticBody);
-        cout << "Cloud dead --> Game over!" <<endl;
+        cout << "Cloud dead --> Game over!" << endl;
     }
     
     float getScore() {
@@ -87,12 +91,17 @@ public:
     
     void drawScore(sf::RenderWindow& window) {
         //Re-creating and updating the text in the sfml text object
-        streamScoreText << "Score: " << round(body->GetPosition().x/scoreCoeff) << " points";
+        streamScoreText.str("Score: ");
+        streamScoreText << round(body->GetPosition().x/scoreCoeff) << " points";
         scoreText = streamScoreText.str();
         sfScore.setString(scoreText);
+        sfScore.setPosition((body->GetPosition().x)*SCALE-100, 0);
         window.draw(sfScore);
     }
-
+    
+    bool isDead() {
+        return dead;
+    }
 };
 
 
@@ -106,15 +115,19 @@ private:
     sf::Texture groundTexture;
     sf::Sprite sprite;
 public:
-    Ground(b2World& world, float X, float Y) {
-        bodyDef.position = b2Vec2(X/SCALE, Y/SCALE);
+    Ground(b2World& world, float X) {
+        bodyDef.position = b2Vec2(X/SCALE, 500.f/SCALE);
         bodyDef.type = b2_staticBody;
         body = world.CreateBody(&bodyDef);
-        shape.SetAsBox((8000.f/2)/SCALE, (16.f/2)/SCALE);
+        shape.SetAsBox((blockLength/2)/SCALE, (16.f/2)/SCALE);
         fixtureDef.density = 0.f;
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
         groundTexture.loadFromFile(resourcePath() + "ground.png");
+    }
+    
+    Ground() {
+        
     }
     
     void draw(sf::RenderWindow& window) {
@@ -153,6 +166,7 @@ public:
         }
     }
     
+    
     void draw(sf::RenderWindow& window) {
         sprite.setTexture(texture);
         sprite.setPosition(body->GetPosition().x * SCALE, body->GetPosition().y * SCALE);
@@ -181,6 +195,52 @@ public:
 };
 
 
+static int nbBlocks = 0; //Migrer vers block.cpp avec la classe
+class Block {
+private:
+    int N;
+    vector<Obstacle> obstacles = vector<Obstacle>();
+    Ground ground;
+public:
+    Block(b2World& world, int N){
+        for (int i=0 ; i<5 ; i++) {
+            obstacles.push_back(Storm(world, SCALE*(N*blockLength+i*blockLength/5), 100)); //Storms espacés de 1000m
+            obstacles.push_back(Tornado(world, SCALE*(N*blockLength+(i+0.5)*blockLength/5), 400)); //Tornades espacées de 1000m
+        }
+        this->N = N;
+        ground = Ground(world, (N+0.5)*blockLength);
+        nbBlocks+=1;
+    }
+    
+    Block() {
+        
+    }
+    
+    ~Block() {
+        ground.~Ground();
+//        for (auto it=obstacles.begin(); it<obstacles.end() ; it++) {
+//            it->~Obstacle();
+//        }
+        nbBlocks--;
+    }
+    
+    void draw(sf::RenderWindow& window) {
+        ground.draw(window);
+        for (auto obs = obstacles.begin() ; obs<obstacles.end(); obs++) {
+            obs->draw(window);
+        }
+    }
+    
+    float getPosition() {
+        return (N+0.5)*blockLength;
+    }
+    
+    int getNbBlocks() {
+        return nbBlocks;
+    }
+};
+
+
 int main(int, char const**)
 {
     loadVariables();
@@ -188,31 +248,32 @@ int main(int, char const**)
     /** Prepare the world */
     b2Vec2 gravity(gravityX, gravityY);
     b2World world(gravity);
-    Ground ground = Ground(world, 400.f, 500.f);
-    Cloud cloud = Cloud(world);
-    vector<Obstacle> obstacles = vector<Obstacle>();
-    for (int i=0 ; i<100 ; i++) {
-        obstacles.push_back(Storm(world, i*1000, 100));
-        obstacles.push_back(Tornado(world, (i+0.5)*1000, 400));
-    }
+    Cloud cloud(world);
+    
+    int N=0;
+    
+    vector<unique_ptr<Block>> blockPtrs;
+    blockPtrs.push_back(make_unique<Block>(world, N));
+    blockPtrs.push_back(make_unique<Block>(world, N+1));
+    
     
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
     sf::View view(sf::FloatRect(0, 0, 800, 600));
+    window.setFramerateLimit(1/timeStep);
     window.setView(view);
     
     
     // Clear screen
     window.clear();
     
-    
-    
-    
-
-    
+    sf::Clock clock;
     // Start the game loop
     while (window.isOpen())
     {
+        sf::Time elapsed = clock.restart();
+        world.Step(elapsed.asSeconds(), velocityIterations, positionIterations);
+        
         // Process events
         sf::Event event;
         while (window.pollEvent(event))
@@ -240,27 +301,29 @@ int main(int, char const**)
                 b2Vec2 gravity(gravityX, gravityY);
                 world.SetGravity(gravity);
             }
-            
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-            {
-                int mouseX = sf::Mouse::getPosition(window).x;
-                int mouseY = sf::Mouse::getPosition(window).y;
-                
-            }
         }
         
-        world.Step(timeStep, velocityIterations, positionIterations);
         
         window.clear(sf::Color::White);
-        int bodyCount = 0;
         cloud.draw(window);
-        ground.draw(window);
         cloud.drawScore(window);
-        for (auto obs = obstacles.begin() ; obs<obstacles.end(); obs++) {
-            obs->draw(window);
+        blockPtrs[0]->draw(window);
+        blockPtrs[1]->draw(window);
+        if(N!=0) {
+            blockPtrs[2]->draw(window);
         }
-        
-        
+        cout << "blockPtrs[1]->getPosition() = " << blockPtrs[1]->getPosition() << ", cloud.getPositionX()*SCALE = " << cloud.getPositionX()*SCALE << endl;
+        if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPosition()) {
+            cout << "Passage à droite" <<endl;
+            if(N!=0) {
+                cout << "Length of blockPtrs : " << blockPtrs.size();
+                blockPtrs.erase(blockPtrs.begin());
+            }
+            blockPtrs.push_back(make_unique<Block>(world, N));
+            N+=1;
+            
+            cout << "Block numéro " << N << " construit, " << N-2 << " détruit." << endl;
+        }
         
         // Update the window
         view.setCenter(SCALE*cloud.getPositionX(), 300);
@@ -270,24 +333,6 @@ int main(int, char const**)
     
     return EXIT_SUCCESS;
 }
-
-
-void createObstacle(b2World& world, float X, float Y)
-{
-    b2BodyDef bodyDef;
-    bodyDef.position = b2Vec2(850, 100);
-    bodyDef.position = b2Vec2(X/SCALE, Y/SCALE);
-    bodyDef.type = b2_staticBody;
-    b2Body* body = world.CreateBody(&bodyDef);
-    
-    b2PolygonShape shape;
-    shape.SetAsBox((16.f/2)/SCALE, (16.f/2)/SCALE);
-    b2FixtureDef fixtureDef;
-    fixtureDef.density = 0.f;
-    fixtureDef.shape = &shape;
-    body->CreateFixture(&fixtureDef);
-}
-
 
 
 void loadVariables() {

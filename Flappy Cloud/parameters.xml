@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Parameters name="parameters_root">
-    <Gravity GravityX="0" GravityY="3.0"/>
-    <Velocity VelocityX="1.0" VelocityY="-5.0"/>
+    <Gravity GravityX="0" GravityY="30.0"/>
+    <Velocity VelocityX="10.0" VelocityY="-10.0"/>
     <Score ScoreCoeff="10.0"/>
-    <Iterations TimeStep="0.02 " VelocityIterations="8.0" PositionIterations="3.0"/>
+    <Iterations TimeStep="0.0167 " VelocityIterations="8.0" PositionIterations="3.0"/>
 </Parameters>
