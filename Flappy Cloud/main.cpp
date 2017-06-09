@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <memory>
+#include <random>
 
 #include "ResourcePath.hpp"
 #include "cloud.cpp"
@@ -12,6 +13,7 @@
 using namespace std;
 using namespace pugi;
 
+int randomIntBetween(int inf, int sup);
 void loadVariables();
 
 static float gravityX, gravityY;
@@ -19,7 +21,6 @@ static float velocityY, velocityX;
 static float scoreCoeff;
 static float timeStep, velocityIterations, positionIterations;
 static float blockLength = 800.f;
-
 static float stormVelocityY; // Storm objects vertical velocity (moving obstacles)
 
 enum obstacleType {storm, tornado};
@@ -194,18 +195,16 @@ public:
 
 static int nbObstacles = 0;
 class Obstacle {
-protected: // Protected: un objet de classe dérivée peut accéder à ses propres attributs définis dans la classe mère
+protected: // Protected: objet de classe dérivée peut accéder à ses propres attributs déf dans la classe base
     b2BodyDef bodyDef;
     b2Body* body;
     b2PolygonShape shape;
     b2FixtureDef fixtureDef;
     sf::Texture texture;
     sf::Sprite sprite;
-//    obstacleType type;
     
 public:
     Obstacle(b2World& world, float X, float Y, float width, float height) {
-//        this->type = type;
         bodyDef.position = b2Vec2(X/SCALE, Y/SCALE);
         bodyDef.type = b2_kinematicBody;
         body = world.CreateBody(&bodyDef);
@@ -213,28 +212,19 @@ public:
         fixtureDef.density = 0.f;
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
-//        if(type == obstacleType::storm) {
-//            texture.loadFromFile(resourcePath() + "storm.png");
-//            sprite.setOrigin(50.f, 50.f);
-//        } else if(type == obstacleType::tornado) {
-//            texture.loadFromFile(resourcePath() + "tornado.png");
-//            sprite.setOrigin(50.f, 74.5f);
-//       }
+
         nbObstacles++;
     }
 
     ~Obstacle() {
         nbObstacles--;
     }
-
-
-
+    
     void draw(sf::RenderWindow& window) {
         sprite.setTexture(texture);
         sprite.setPosition(body->GetPosition().x * SCALE, body->GetPosition().y * SCALE);
         sprite.setRotation(180/b2_pi * body->GetAngle());
         window.draw(sprite);
-
     }
 };
 
@@ -246,19 +236,25 @@ private:
     
 public:
     Storm(b2World& world, float X, float Y): Obstacle(world, X, Y,  100.f, 100.f) {
-        topLimit = Y + 40;
-        bottomLimit = Y - 40;
         
         texture.loadFromFile(resourcePath() + "storm.png");
         sprite.setOrigin(50.f, 50.f);
         
-        body->SetLinearVelocity(b2Vec2(0, stormVelocityY));
-        topLimit = Y + 40;
-        bottomLimit =Y - 40;
+        body->SetLinearVelocity(b2Vec2(0, randomIntBetween(-stormVelocityY ,stormVelocityY)));
+
+        topLimit = randomIntBetween(215, 400); //400 étant environ à hauteur du sol (à vérifier, estimation…)
+        bottomLimit = randomIntBetween(35, 215); //35 hauteur du plafond
+
     }
     
+    void updateVelocity() {
+        if (body->GetLinearVelocity().y > 0) {
+            if (body->GetPosition().y > topLimit/SCALE) body->SetLinearVelocity(b2Vec2(0, -stormVelocityY));
+        }
+        else if (body->GetPosition().y < bottomLimit/SCALE) body->SetLinearVelocity(b2Vec2(0, stormVelocityY));
+    }
     
-    
+
 };
 
 
@@ -270,6 +266,9 @@ public:
         texture.loadFromFile(resourcePath() + "tornado.png");
         sprite.setOrigin(50.f, 74.5f);
     }
+    
+    void updateVelocity() {}
+
 };
 
 
@@ -277,14 +276,15 @@ static int nbBlocks = 0; //Migrer vers block.cpp avec la classe
 class Block {
 private:
     int N;
-    vector<Obstacle> obstacles = vector<Obstacle>();
+    vector<Storm> storms = vector<Storm>();
+    vector<Tornado> tornadoes = vector<Tornado>();
     Ground ground;
     Ceilling ceilling;
 public:
     Block(b2World& world, int N){
         for (int i=0 ; i<1 ; i++) {
-            obstacles.push_back(Storm(world, N*blockLength+i*blockLength/1, 100)); //Storms espacés de 1000m
-            obstacles.push_back(Tornado(world, N*blockLength+(i+0.5)*blockLength/1, 400));
+            storms.push_back(Storm(world, N*blockLength+i*blockLength/1, 100)); //Storms espacés de 1000m
+            tornadoes.push_back(Tornado(world, N*blockLength+(i+0.5)*blockLength/1, 400));
         }
         this->N = N;
         ground = Ground(world, (N+0.5)*blockLength);
@@ -297,18 +297,23 @@ public:
     }
 
     ~Block() {
-//        ground.~Ground();
-//        for (auto it=obstacles.begin(); it<obstacles.end() ; it++) {
-//            it->~Obstacle();
-//        }
+
         nbBlocks--;
     }
 
     void draw(sf::RenderWindow& window) {
         ground.draw(window);
-        for (auto obs = obstacles.begin() ; obs<obstacles.end(); obs++) {
-            obs->draw(window);
+
+        for (auto sto = storms.begin() ; sto<storms.end(); sto++) {
+            sto->updateVelocity();
+            sto->draw(window);
         }
+        for (auto tor = tornadoes.begin() ; tor<tornadoes.end(); tor++) {
+            tor->draw(window);
+        }
+
+        
+        
         ceilling.draw(window);
     }
 
@@ -391,10 +396,10 @@ int main(int, char const**)
         cloud.drawScore(window);
         blockPtrs[0]->draw(window);
         blockPtrs[1]->draw(window);
-            blockPtrs[2]->draw(window);
-        cout << "blockPtrs[1]->getPosition() = " << blockPtrs[1]->getPosition() << ", cloud.getPositionX()*SCALE = " << cloud.getPositionX()*SCALE<< ", cloud.getPositionY()*SCALE = " << cloud.getPositionY()*SCALE << endl;
-        
-        cout << "nbBlocks = " << nbBlocks << ", nbGrounds = " << nbGrounds << ", nbObstacles = " << nbObstacles << endl;
+        blockPtrs[2]->draw(window);
+//        cout << "blockPtrs[1]->getPosition() = " << blockPtrs[1]->getPosition() << ", cloud.getPositionX()*SCALE = " << cloud.getPositionX()*SCALE<< ", cloud.getPositionY()*SCALE = " << cloud.getPositionY()*SCALE << endl;
+//        
+//        cout << "nbBlocks = " << nbBlocks << ", nbGrounds = " << nbGrounds << ", nbObstacles = " << nbObstacles << endl;
         if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPosition()) {
             cout << "Passage à droite" <<endl;
                 cout << "Length of blockPtrs : " << blockPtrs.size();
@@ -414,6 +419,12 @@ int main(int, char const**)
     return EXIT_SUCCESS;
 }
 
+int randomIntBetween(int inf, int sup) {
+    static std::random_device rd;
+    static std::default_random_engine engine(rd());
+    std::uniform_int_distribution<unsigned> distribution(inf, sup);
+    return distribution(engine);
+}
 
 void loadVariables() {
     pugi::xml_document doc;
