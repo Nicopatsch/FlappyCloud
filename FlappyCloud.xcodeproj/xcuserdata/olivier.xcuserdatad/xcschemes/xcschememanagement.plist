@@ -9,9 +9,19 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>TestFlappyCloud.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>452298441EDD6DD100E78D32</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>455C4C9B1ED83FF300271814</key>
 		<dict>
 			<key>primary</key>
