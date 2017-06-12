@@ -22,6 +22,7 @@ static float scoreCoeff;
 static float timeStep, velocityIterations, positionIterations;
 static float blockLength = 800.f;
 static float stormVelocityY; // Storm objects vertical velocity (moving obstacles)
+static float epsilon;
 
 enum obstacleType {storm, tornado};
 
@@ -33,10 +34,6 @@ private:
     b2FixtureDef fixtureDef;
     sf::Texture cloudTexture;
     sf::Sprite sprite;
-    string scoreText;
-    stringstream streamScoreText;
-    sf::Font font;
-    sf::Text sfScore;
     bool dead;
 public:
     Cloud(b2World& world)
@@ -54,14 +51,11 @@ public:
         body->SetLinearVelocity(b2Vec2(velocityX, 0));
         body->SetFixedRotation(true);
 
-        //Prepare the sfml score text
-        if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
-            return EXIT_FAILURE;
-        }
-        sfScore = sf::Text(scoreText, font, 50);
-        sfScore.setFillColor(sf::Color::Black);
-
         dead = false;
+    }
+    
+    Cloud() {
+        
     }
 
     void jump() {
@@ -96,19 +90,26 @@ public:
         return round(body->GetPosition().x/scoreCoeff);
     }
 
-    void drawScore(sf::RenderWindow& window) {
-        //Re-creating and updating the text in the sfml text object
-        streamScoreText.str("Score: ");
-        streamScoreText << round(body->GetPosition().x/scoreCoeff) << " points";
-        scoreText = streamScoreText.str();
-        sfScore.setString(scoreText);
-        sfScore.setPosition((body->GetPosition().x)*SCALE-100, 0);
-        window.draw(sfScore);
-    }
-
     bool isDead() {
         return dead;
     }
+    
+    float getWidth() {
+        return (100.f/2)/SCALE;
+    }
+    
+    float getHeight() {
+        return (67.f/2)/SCALE;
+    }
+    
+    bool checkDead() {
+        if (body->GetLinearVelocity().x < velocityX) {
+            this->kill();
+            return true;
+        }
+        return false;
+    }
+    
 };
 
 
@@ -202,6 +203,7 @@ protected: // Protected: objet de classe dérivée peut accéder à ses propres 
     b2FixtureDef fixtureDef;
     sf::Texture texture;
     sf::Sprite sprite;
+    float height, width;
     
 public:
     Obstacle(b2World& world, float X, float Y, float width, float height) {
@@ -212,7 +214,10 @@ public:
         fixtureDef.density = 0.f;
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
-
+        
+        this->height = (height/2)/SCALE;
+        this->width=(width/2)/SCALE;
+        
         nbObstacles++;
     }
 
@@ -311,11 +316,9 @@ public:
         for (auto tor = tornadoes.begin() ; tor<tornadoes.end(); tor++) {
             tor->draw(window);
         }
-
-        
-        
         ceilling.draw(window);
     }
+    
 
     float getPosition() {
         return (N+0.5)*blockLength;
@@ -327,22 +330,108 @@ public:
 };
 
 
+class Game{
+private:
+    Cloud cloud;
+    b2Vec2 gravity;
+    b2World* world;
+    int nbOfBlocks;
+    vector<unique_ptr<Block>> blockPtrs; //Pointeurs vers les 3 blocks que l'on suit. A chaque création d'un block, on supprime le premier de la liste et on rajoute le nouveau à la fin
+    stringstream streamScoreText;
+    sf::Text sfScore;
+    stringstream streamGameOverText;
+    sf::Text sfGameOver;
+    sf::Font font;
+    
+    
+public:
+    Game() {
+        loadVariables();
+        
+        /** Prepare the world */
+        gravity = b2Vec2(gravityX, gravityY);
+        world = new b2World(gravity);
+        cloud = Cloud(*world);
+        nbOfBlocks = 0;
+        
+        /*Initialisation du premier triplet de blocks*/
+        blockPtrs.push_back(make_unique<Block>(*world, nbOfBlocks-1));
+        blockPtrs.push_back(make_unique<Block>(*world, nbOfBlocks));
+        blockPtrs.push_back(make_unique<Block>(*world, nbOfBlocks+1));
+        
+        //Prepare the sfml score text
+        if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
+            return EXIT_FAILURE;
+        }
+        sfScore = sf::Text(streamScoreText.str(), font, 50);
+        sfScore.setFillColor(sf::Color::Black);
+        sfGameOver = sf::Text("Game Over!", font, 50);
+        sfGameOver.setFillColor(sf::Color::Black);
+    }
+    
+    void setStep(sf::Time elapsed) {
+        world->Step(elapsed.asSeconds(), velocityIterations, positionIterations);
+    }
+    
+    void jumpCloud() {
+        cloud.jump();
+    }
+    
+    void SetGravity(b2Vec2 gravity) {
+        world->SetGravity(gravity);
+    }
+    
+    void draw(sf::RenderWindow& window) {
+        cloud.draw(window);
+        blockPtrs[0]->draw(window);
+        blockPtrs[1]->draw(window);
+        blockPtrs[2]->draw(window);
+        
+        /*Draw the score (only if not dead)*/
+        if (!cloud.isDead()) {
+            streamScoreText.str("Score: ");
+            streamScoreText << round(cloud.getPositionX()/scoreCoeff) << " points";
+            sfScore.setString(streamScoreText.str());
+            sfScore.setPosition((cloud.getPositionX())*SCALE-100, 0);
+            window.draw(sfScore);
+        } else {
+            /*Transformation du texte de score "Game Over"*/
+            streamGameOverText.str("");
+            streamGameOverText.clear();
+            streamGameOverText.str("Game Over! Score: ");
+            streamGameOverText << round(cloud.getPositionX()/scoreCoeff) << " points";
+            sfGameOver.setString(streamGameOverText.str());
+            sfGameOver.setPosition((cloud.getPositionX())*SCALE-100, 200);
+            window.draw(sfGameOver);
+        }
+
+    }
+    
+    void checkGameOver() {
+        if (cloud.checkDead()) {
+            
+        }
+    }
+    
+    void updateBlocks() {
+        if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPosition()) {
+            /*Destruction du premier block puis ajout d'un nouveau en fin de vector blockPtrs*/
+            blockPtrs.erase(blockPtrs.begin());
+            blockPtrs.push_back(make_unique<Block>(*world, nbOfBlocks));
+            nbOfBlocks+=1;
+        }
+    }
+    
+    pair<float, float> center() {
+        return pair<float, float>(SCALE*cloud.getPositionX(), 300);
+    }
+};
+
 int main(int, char const**)
 {
-    loadVariables();
-
-    /** Prepare the world */
-    b2Vec2 gravity(gravityX, gravityY);
-    b2World world(gravity);
-    Cloud cloud(world);
-
-    int N=0;
-
-    vector<unique_ptr<Block>> blockPtrs;
-    blockPtrs.push_back(make_unique<Block>(world, N-1));
-    blockPtrs.push_back(make_unique<Block>(world, N));
-    blockPtrs.push_back(make_unique<Block>(world, N+1));
-
+    
+    /*Initialize new game*/
+    Game game = Game();
 
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
@@ -359,7 +448,7 @@ int main(int, char const**)
     while (window.isOpen())
     {
         sf::Time elapsed = clock.restart();
-        world.Step(elapsed.asSeconds(), velocityIterations, positionIterations);
+        game.setStep(elapsed);
 
         // Process events
         sf::Event event;
@@ -374,44 +463,30 @@ int main(int, char const**)
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
                 window.close();
             }
-
+            
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
-                cloud.jump();
+                game.jumpCloud();
             }
 
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::K) {
-                cloud.kill();
-            }
-
+            /*Pour changer les variables en cours de route*/
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return) {
                 loadVariables();
                 b2Vec2 gravity(gravityX, gravityY);
-                world.SetGravity(gravity);
+                game.SetGravity(gravity);
             }
         }
 
 
         window.clear(sf::Color(119, 185, 246));
-        cloud.draw(window);
-        cloud.drawScore(window);
-        blockPtrs[0]->draw(window);
-        blockPtrs[1]->draw(window);
-        blockPtrs[2]->draw(window);
-//        cout << "blockPtrs[1]->getPosition() = " << blockPtrs[1]->getPosition() << ", cloud.getPositionX()*SCALE = " << cloud.getPositionX()*SCALE<< ", cloud.getPositionY()*SCALE = " << cloud.getPositionY()*SCALE << endl;
-//        
-//        cout << "nbBlocks = " << nbBlocks << ", nbGrounds = " << nbGrounds << ", nbObstacles = " << nbObstacles << endl;
-        if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPosition()) {
-            cout << "Passage à droite" <<endl;
-                cout << "Length of blockPtrs : " << blockPtrs.size();
-                blockPtrs.erase(blockPtrs.begin());
-            blockPtrs.push_back(make_unique<Block>(world, N));
-            N+=1;
-
-            cout << "Block numéro " << N << " construit, " << N-2 << " détruit." << endl;
-        }
-
+        
+        game.draw(window);
+        
+        game.checkGameOver();
+        
+        game.updateBlocks();
+        
         // Update the window
-        view.setCenter(SCALE*cloud.getPositionX(), 300);
+        view.setCenter(game.center().first, game.center().second);
         window.setView(view);
         window.display();
     }
@@ -443,4 +518,6 @@ void loadVariables() {
     timeStep=stof(parameters.child("Iterations").attribute("TimeStep").value());
     velocityIterations=stof(parameters.child("Iterations").attribute("VelocityIterations").value());
     positionIterations=stof(parameters.child("Iterations").attribute("PositionIterations").value());
+    
+    epsilon=stof(parameters.child("Kill").attribute("Epsilon").value());
 }
