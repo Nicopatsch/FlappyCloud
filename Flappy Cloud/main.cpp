@@ -16,16 +16,20 @@ using namespace pugi;
 int randomIntBetween(int inf, int sup);
 void loadVariables();
 
+/*Toutes les variables globales qui vont être initialisées
+ depuis le fichier parameters.xml grâce à la fonction loadVariables()*/
 static float gravityX, gravityY;
 static float velocityY, velocityX;
 static float scoreCoeff;
 static float timeStep, velocityIterations, positionIterations;
-static float blockLength = 800.f;
+static float blockLength; //Length of a block
+static int obstPerBlock; //Number of each type of obstacles per block
 static float stormVelocityY; // Storm objects vertical velocity (moving obstacles)
 static float epsilon;
 
 enum obstacleType {storm, tornado};
 
+/*Cloud est la classe de notre nuage, instanciée à chaque nouveau jeu*/
 class Cloud {
 private:
     b2BodyDef bodyDef;
@@ -38,8 +42,10 @@ private:
 public:
     Cloud(b2World& world)
     {
+        /*On crée principalement tout ce qui est nécessaire à Box2D
+         pour faire un objet qui nous convient*/
         cloudTexture.loadFromFile(resourcePath() + "cloud.png");
-        bodyDef.position = b2Vec2(300/SCALE, 200/SCALE);
+        bodyDef.position = b2Vec2((-1000)/SCALE, 200/SCALE);
         bodyDef.type = b2_dynamicBody;
         body = world.CreateBody(&bodyDef);
         shape.SetAsBox((100.f/2)/SCALE, (67.f/2)/SCALE);
@@ -55,7 +61,7 @@ public:
     }
     
     Cloud() {
-        
+        //Constructeur par défaut (nécessaire de le déclarer, même vide)
     }
 
     void jump() {
@@ -78,28 +84,23 @@ public:
         return body->GetPosition().y;
     }
     
+    /*Fonction appelée lors de la mort du nuage. 
+     Il s'arrête et se retourne sur le dos*/
     void kill() {
         dead=true;
         body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), b2_pi);
         body->SetLinearVelocity(b2Vec2(0,0));
         body->SetType(b2_staticBody);
-        cout << "Cloud dead --> Game over!" << endl;
     }
 
     float getScore() {
+        /*Le score est proportionnel à la distance parcourue,
+         au coefficient scoreCoeff prêt*/
         return round(body->GetPosition().x/scoreCoeff);
     }
 
     bool isDead() {
         return dead;
-    }
-    
-    float getWidth() {
-        return (100.f/2)/SCALE;
-    }
-    
-    float getHeight() {
-        return (67.f/2)/SCALE;
     }
     
     bool checkDead() {
@@ -113,7 +114,11 @@ public:
 };
 
 
+/*Variable globale permettant garder un oeil 
+ sur le nombre de grounds existant. Elle est incrémentée
+ par Ground() et décrémentée par ~Ground().*/
 static int nbGrounds = 0;
+/*La classe Ground permet de créer des morceaux de sol (un par block)*/
 class Ground {
 private:
     b2BodyDef bodyDef;
@@ -124,6 +129,8 @@ private:
     sf::Sprite sprite;
 public:
     Ground(b2World& world, float X) {
+        /*Selon la valeur de blockLength (modifiable dans parameters.xml)
+         Les blocks, grounds et ceillings s'adapteront et adapteront leur texture.*/
         bodyDef.position = b2Vec2(X/SCALE, 500.f/SCALE);
         bodyDef.type = b2_staticBody;
         body = world.CreateBody(&bodyDef);
@@ -132,6 +139,8 @@ public:
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
         groundTexture.loadFromFile(resourcePath() + "ground.png");
+        groundTexture.setRepeated(true);
+        
         nbGrounds++;
     }
 
@@ -147,12 +156,14 @@ public:
         sprite.setTexture(groundTexture);
         sprite.setOrigin(blockLength/2, 8.f);
         sprite.setPosition(body->GetPosition().x * SCALE, body->GetPosition().y * SCALE);
+        sprite.setTextureRect(sf::IntRect(0,0,blockLength,128.f));
         sprite.setRotation(180/b2_pi * body->GetAngle());
         window.draw(sprite);
     }
 };
 
-
+/*La classe Ceilling est très similaire à la classe Ground.
+ Elle permet de créer les morceaux de plafond nuageux.*/
 static int nbCeillings = 0;
 class Ceilling {
 private:
@@ -167,11 +178,12 @@ public:
         bodyDef.position = b2Vec2(X/SCALE, -13.f/SCALE);
         bodyDef.type = b2_staticBody;
         body = world.CreateBody(&bodyDef);
-        shape.SetAsBox((blockLength/2)/SCALE, 6.5f/SCALE);
+        shape.SetAsBox((blockLength/2)/SCALE, (13.f/2)/SCALE);
         fixtureDef.density = 0.f;
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
         ceillingTexture.loadFromFile(resourcePath() + "ceilling.png");
+        ceillingTexture.setRepeated(true);
         nbCeillings++;
     }
 
@@ -187,13 +199,15 @@ public:
         sprite.setTexture(ceillingTexture);
         sprite.setOrigin(blockLength/2, -13.f);
         sprite.setPosition(body->GetPosition().x * SCALE, body->GetPosition().y * SCALE);
+        sprite.setTextureRect(sf::IntRect(0,0,blockLength,13.f));
         sprite.setRotation(180/b2_pi * body->GetAngle());
         window.draw(sprite);
     }
 };
 
 
-
+/*Les obstacles sont de 2 types (classes dérivées).
+ Encore une fois, on garde un compteur du nombre d'Obstacles créés*/
 static int nbObstacles = 0;
 class Obstacle {
 protected: // Protected: objet de classe dérivée peut accéder à ses propres attributs déf dans la classe base
@@ -234,11 +248,14 @@ public:
 };
 
 
+/*Les Storms sont un type d'Obstacles. Leur particularité 
+ est qu'ils translatent aléatoirement de haut en bas*/
 class Storm: public Obstacle {
 private:
+    /*Variables privées propres à Storm permettant de
+    mettre des limites au déplacement de l'obstacle*/
     float topLimit;
     float bottomLimit;
-    
 public:
     Storm(b2World& world, float X, float Y): Obstacle(world, X, Y,  100.f, 100.f) {
         
@@ -247,8 +264,8 @@ public:
         
         body->SetLinearVelocity(b2Vec2(0, randomIntBetween(-stormVelocityY ,stormVelocityY)));
 
-        topLimit = randomIntBetween(215, 400); //400 étant environ à hauteur du sol (à vérifier, estimation…)
-        bottomLimit = randomIntBetween(35, 215); //35 hauteur du plafond
+        topLimit = randomIntBetween(215, 400);
+        bottomLimit = randomIntBetween(35, 215);
 
     }
     
@@ -277,7 +294,7 @@ public:
 };
 
 
-static int nbBlocks = 0; //Migrer vers block.cpp avec la classe
+static int nbBlocks = 0;
 class Block {
 private:
     int N;
@@ -287,9 +304,11 @@ private:
     Ceilling ceilling;
 public:
     Block(b2World& world, int N){
-        for (int i=0 ; i<1 ; i++) {
-            storms.push_back(Storm(world, N*blockLength+i*blockLength/1, 100)); //Storms espacés de 1000m
-            tornadoes.push_back(Tornado(world, N*blockLength+(i+0.5)*blockLength/1, 400));
+        if(N!=-1){
+            for (int i=0 ; i<obstPerBlock ; i++) {
+                storms.push_back(Storm(world, N*blockLength+i*blockLength/obstPerBlock, 100)); //Storms espacés de 1000m
+                tornadoes.push_back(Tornado(world, N*blockLength+(i+0.5)*blockLength/obstPerBlock, 400));
+            }
         }
         this->N = N;
         ground = Ground(world, (N+0.5)*blockLength);
@@ -320,8 +339,12 @@ public:
     }
     
 
-    float getPosition() {
+    float getPositionX() {
         return (N+0.5)*blockLength;
+    }
+    
+    int getIndex() {
+        return N;
     }
 
     int getNbBlocks() {
@@ -335,11 +358,11 @@ private:
     Cloud cloud;
     b2Vec2 gravity;
     b2World* world;
-    int nbOfBlocks;
+    int blockIndex;
+    int bestScore;
     vector<unique_ptr<Block>> blockPtrs; //Pointeurs vers les 3 blocks que l'on suit. A chaque création d'un block, on supprime le premier de la liste et on rajoute le nouveau à la fin
-    stringstream streamScoreText;
+    stringstream score;
     sf::Text sfScore;
-    stringstream streamGameOverText;
     sf::Text sfGameOver;
     sf::Font font;
     
@@ -352,21 +375,21 @@ public:
         gravity = b2Vec2(gravityX, gravityY);
         world = new b2World(gravity);
         cloud = Cloud(*world);
-        nbOfBlocks = 0;
+        blockIndex = 0;
         
         /*Initialisation du premier triplet de blocks*/
-        blockPtrs.push_back(make_unique<Block>(*world, nbOfBlocks-1));
-        blockPtrs.push_back(make_unique<Block>(*world, nbOfBlocks));
-        blockPtrs.push_back(make_unique<Block>(*world, nbOfBlocks+1));
+        blockPtrs.push_back(make_unique<Block>(*world, -1));
+        blockPtrs.push_back(make_unique<Block>(*world, 0));
+        blockPtrs.push_back(make_unique<Block>(*world, 1));
         
         //Prepare the sfml score text
         if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
             return EXIT_FAILURE;
         }
-        sfScore = sf::Text(streamScoreText.str(), font, 50);
-        sfScore.setFillColor(sf::Color::Black);
+        sfScore = sf::Text(score.str(), font, 50);
+        sfScore.setFillColor(sf::Color::White);
         sfGameOver = sf::Text("Game Over!", font, 50);
-        sfGameOver.setFillColor(sf::Color::Black);
+        sfGameOver.setFillColor(sf::Color::White);
     }
     
     void setStep(sf::Time elapsed) {
@@ -388,19 +411,19 @@ public:
         blockPtrs[2]->draw(window);
         
         /*Draw the score (only if not dead)*/
+        score.str("");
+        score.clear();
+        score << cloud.getScore();
         if (!cloud.isDead()) {
-            streamScoreText.str("Score: ");
-            streamScoreText << round(cloud.getPositionX()/scoreCoeff) << " points";
-            sfScore.setString(streamScoreText.str());
-            sfScore.setPosition((cloud.getPositionX())*SCALE-100, 0);
-            window.draw(sfScore);
+            if(cloud.getPositionX()>0) {
+                string scoreText = "Score: " + score.str() + " points";
+                sfScore.setString(scoreText);
+                sfScore.setPosition((cloud.getPositionX())*SCALE-100, 20);
+                window.draw(sfScore);
+            }
         } else {
-            /*Transformation du texte de score "Game Over"*/
-            streamGameOverText.str("");
-            streamGameOverText.clear();
-            streamGameOverText.str("Game Over! Score: ");
-            streamGameOverText << round(cloud.getPositionX()/scoreCoeff) << " points";
-            sfGameOver.setString(streamGameOverText.str());
+            string gameOverText = "Game Over! \nScore: " + score.str() +"\nBest Score: "+to_string(bestScore)+"\nRestart: R";
+            sfGameOver.setString(gameOverText);
             sfGameOver.setPosition((cloud.getPositionX())*SCALE-100, 200);
             window.draw(sfGameOver);
         }
@@ -408,22 +431,59 @@ public:
     }
     
     void checkGameOver() {
-        if (cloud.checkDead()) {
+        if (!cloud.checkDead()) {
+            pugi::xml_document doc;
             
+            if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/parameters.xml")) cout << "Failed loading file" << endl;
+            bestScore = stoi(doc.child("Parameters").child("Score").attribute("BestScore").value());
+            
+            
+            cout<<"bestScore = "<<bestScore<<" et cloud.getPositionX()/scoreCoeff = "<<cloud.getScore()<<endl;
+            if (bestScore<cloud.getScore() && cloud.getScore()>0) {
+                bestScore = cloud.getScore();
+                cout << "New best score" <<endl;
+//                doc.child("Score").attribute("BestScore").value() = bestScore;
+                doc.child("Parameters").child("Score").attribute("BestScore").set_value(to_string(bestScore).c_str());
+                cout<<"Done : "<<doc.child("Parameters").child("Score").attribute("BestScore").value()<<endl;
+                cout<<"to_string(bestScore) = "<<to_string(bestScore)<<endl;
+                doc.save_file("../../../../../../../../FlappyCloud/Flappy Cloud/parameters.xml");
+//                doc.child("Score").find_attribute("BestScore").set_value(bestScore);
+            }
         }
     }
     
-    void updateBlocks() {
-        if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPosition()) {
+    bool updateBlocks() {
+//        cout << "Cloud position*SCALE: " << cloud.getPositionX()*SCALE << "; block[1] position: " << blockPtrs[1]->getPositionX()<<endl;
+        if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPositionX()) {
             /*Destruction du premier block puis ajout d'un nouveau en fin de vector blockPtrs*/
             blockPtrs.erase(blockPtrs.begin());
-            blockPtrs.push_back(make_unique<Block>(*world, nbOfBlocks));
-            nbOfBlocks+=1;
+            blockPtrs.push_back(make_unique<Block>(*world, blockIndex));
+            blockIndex+=1;
         }
+        return blockIndex%2==0;//returns true if blockIndex is eaven
     }
     
     pair<float, float> center() {
-        return pair<float, float>(SCALE*cloud.getPositionX(), 300);
+        return pair<float, float>(SCALE*cloud.getPositionX()+100, 300);
+    }
+    
+    void restart() {
+        blockPtrs.erase(blockPtrs.begin());
+        blockPtrs.erase(blockPtrs.begin());
+        blockPtrs.erase(blockPtrs.begin());
+        
+        loadVariables();
+        gravity = b2Vec2(gravityX, gravityY);
+        world = new b2World(gravity);
+        cloud.~Cloud();
+        cloud = Cloud(*world);
+        blockIndex = 0;
+
+        /*Initialisation du premier triplet de blocks*/
+        blockPtrs.push_back(make_unique<Block>(*world, -1));
+        blockPtrs.push_back(make_unique<Block>(*world, 0));
+        blockPtrs.push_back(make_unique<Block>(*world, 1));
+
     }
 };
 
@@ -467,6 +527,12 @@ int main(int, char const**)
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
                 game.jumpCloud();
             }
+            
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+//                game.restart();
+                game.~Game();
+                new (&game) Game();
+            }
 
             /*Pour changer les variables en cours de route*/
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return) {
@@ -478,12 +544,15 @@ int main(int, char const**)
 
 
         window.clear(sf::Color(119, 185, 246));
-        
+//        if (game.updateBlocks()) {
+//            window.clear(sf::Color(119, 185, 246));
+//        } else {
+//            window.clear(sf::Color::Blue);
+//        }
+        game.updateBlocks();
+        game.checkGameOver();
         game.draw(window);
         
-        game.checkGameOver();
-        
-        game.updateBlocks();
         
         // Update the window
         view.setCenter(game.center().first, game.center().second);
@@ -518,6 +587,8 @@ void loadVariables() {
     timeStep=stof(parameters.child("Iterations").attribute("TimeStep").value());
     velocityIterations=stof(parameters.child("Iterations").attribute("VelocityIterations").value());
     positionIterations=stof(parameters.child("Iterations").attribute("PositionIterations").value());
+    obstPerBlock=stoi(parameters.child("Blocks").attribute("ObstPerBlock").value());
+    blockLength=stof(parameters.child("Blocks").attribute("BlockLength").value());
     
     epsilon=stof(parameters.child("Kill").attribute("Epsilon").value());
 }
