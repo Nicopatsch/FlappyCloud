@@ -21,9 +21,10 @@
 		455E14F41EDC81A6004E9EC1 /* storm.png in Resources */ = {isa = PBXBuildFile; fileRef = 455E14F31EDC81A6004E9EC1 /* storm.png */; };
 		4579EE2C1EDB46BC009BDB15 /* cloud.png in Resources */ = {isa = PBXBuildFile; fileRef = 4579EE2B1EDB46BC009BDB15 /* cloud.png */; };
 		4579EE331EDB566C009BDB15 /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4579EE311EDB566C009BDB15 /* pugixml.cpp */; };
-		4579EE351EDB59E4009BDB15 /* parameters.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4579EE341EDB59E4009BDB15 /* parameters.xml */; };
 		457FCE621EE9A1EE006D1863 /* ceilling.png in Resources */ = {isa = PBXBuildFile; fileRef = 457FCE611EE9A1EE006D1863 /* ceilling.png */; };
 		457FCE6A1EE9A857006D1863 /* tornado.png in Resources */ = {isa = PBXBuildFile; fileRef = 457FCE691EE9A857006D1863 /* tornado.png */; };
+		45928D1D1F1E30EB00698D69 /* data.xml in Resources */ = {isa = PBXBuildFile; fileRef = 45928D1C1F1E30EB00698D69 /* data.xml */; };
+		45D4B9661EF27E310082A079 /* ground2.png in Resources */ = {isa = PBXBuildFile; fileRef = 45D4B9651EF27E310082A079 /* ground2.png */; };
 		45F268D31ED84FA900372566 /* b2BroadPhase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 45F268711ED84FA800372566 /* b2BroadPhase.cpp */; };
 		45F268D41ED84FA900372566 /* b2CollideCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 45F268731ED84FA800372566 /* b2CollideCircle.cpp */; };
 		45F268D51ED84FA900372566 /* b2CollideEdge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 45F268741ED84FA800372566 /* b2CollideEdge.cpp */; };
@@ -97,9 +98,10 @@
 		4579EE301EDB566C009BDB15 /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pugiconfig.hpp; sourceTree = "<group>"; };
 		4579EE311EDB566C009BDB15 /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pugixml.cpp; sourceTree = "<group>"; };
 		4579EE321EDB566C009BDB15 /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pugixml.hpp; sourceTree = "<group>"; };
-		4579EE341EDB59E4009BDB15 /* parameters.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = parameters.xml; path = "Flappy Cloud/parameters.xml"; sourceTree = SOURCE_ROOT; };
 		457FCE611EE9A1EE006D1863 /* ceilling.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ceilling.png; sourceTree = "<group>"; };
 		457FCE691EE9A857006D1863 /* tornado.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tornado.png; sourceTree = "<group>"; };
+		45928D1C1F1E30EB00698D69 /* data.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = data.xml; sourceTree = "<group>"; };
+		45D4B9651EF27E310082A079 /* ground2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ground2.png; sourceTree = "<group>"; };
 		45F2686F1ED84FA800372566 /* Box2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2D.h; sourceTree = "<group>"; };
 		45F268711ED84FA800372566 /* b2BroadPhase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2BroadPhase.cpp; sourceTree = "<group>"; };
 		45F268721ED84FA800372566 /* b2BroadPhase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2BroadPhase.h; sourceTree = "<group>"; };
@@ -295,8 +297,9 @@
 			children = (
 				45F269011ED8500700372566 /* box.png */,
 				4579EE2B1EDB46BC009BDB15 /* cloud.png */,
-				4579EE341EDB59E4009BDB15 /* parameters.xml */,
+				45928D1C1F1E30EB00698D69 /* data.xml */,
 				457FCE611EE9A1EE006D1863 /* ceilling.png */,
+				45D4B9651EF27E310082A079 /* ground2.png */,
 				457FCE691EE9A857006D1863 /* tornado.png */,
 				455E14EB1EDC6704004E9EC1 /* ground.png */,
 				455E14F31EDC81A6004E9EC1 /* storm.png */,
@@ -565,14 +568,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				455E14EC1EDC6704004E9EC1 /* ground.png in Resources */,
+				45D4B9661EF27E310082A079 /* ground2.png in Resources */,
 				457FCE6A1EE9A857006D1863 /* tornado.png in Resources */,
 				457FCE621EE9A1EE006D1863 /* ceilling.png in Resources */,
 				455E14F41EDC81A6004E9EC1 /* storm.png in Resources */,
 				455C4CAE1ED83FF300271814 /* icon.png in Resources */,
 				4579EE2C1EDB46BC009BDB15 /* cloud.png in Resources */,
-				4579EE351EDB59E4009BDB15 /* parameters.xml in Resources */,
 				455C4CAC1ED83FF300271814 /* sansation.ttf in Resources */,
 				45F269021ED8500700372566 /* box.png in Resources */,
+				45928D1D1F1E30EB00698D69 /* data.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

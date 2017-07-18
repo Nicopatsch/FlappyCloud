@@ -13,11 +13,12 @@
 using namespace std;
 using namespace pugi;
 
+float distanceBetween(pair<float, float> a, pair<float, float> b);
 int randomIntBetween(int inf, int sup);
 void loadVariables();
 
 /*Toutes les variables globales qui vont être initialisées
- depuis le fichier parameters.xml grâce à la fonction loadVariables()*/
+ depuis le fichier data.xml grâce à la fonction loadVariables()*/
 static float gravityX, gravityY;
 static float velocityY, velocityX;
 static float scoreCoeff;
@@ -27,6 +28,10 @@ static int obstPerBlock; //Number of each type of obstacles per block
 static float stormVelocityY; // Storm objects vertical velocity (moving obstacles)
 static float epsilon;
 
+
+static float circleRadius = .5f;
+
+
 enum obstacleType {storm, tornado};
 
 /*Cloud est la classe de notre nuage, instanciée à chaque nouveau jeu*/
@@ -34,30 +39,39 @@ class Cloud {
 private:
     b2BodyDef bodyDef;
     b2Body* body;
-    b2PolygonShape shape;
-    b2FixtureDef fixtureDef;
-    sf::Texture cloudTexture;
     sf::Sprite sprite;
+    float savedSpeed;
+    bool playing;
     bool dead;
+    int lives;
+    int compteur;
+    
+    vector<pair<sf::CircleShape, pair<float, float>>> sfCircles; //vecteur dont chaque élement est une paire contenant first-le sf::CircleShape et en second une paire de coordonnées
 public:
     Cloud(b2World& world)
     {
-        /*On crée principalement tout ce qui est nécessaire à Box2D
-         pour faire un objet qui nous convient*/
-        cloudTexture.loadFromFile(resourcePath() + "cloud.png");
+        /*Création du body Box2D*/
         bodyDef.position = b2Vec2((-1000)/SCALE, 200/SCALE);
-        bodyDef.type = b2_dynamicBody;
+        bodyDef.type = b2_staticBody;
+        bodyDef.fixedRotation =true;
         body = world.CreateBody(&bodyDef);
-        shape.SetAsBox((100.f/2)/SCALE, (67.f/2)/SCALE);
-        fixtureDef.density = 1.f;
-        fixtureDef.friction = 0.f;
-        fixtureDef.restitution = 0.1f;
-        fixtureDef.shape = &shape;
-        body->CreateFixture(&fixtureDef);
-        body->SetLinearVelocity(b2Vec2(velocityX, 0));
-        body->SetFixedRotation(true);
 
+        /*Création du premier cercle Box2D*/
+        b2CircleShape circleShape;
+        circleShape.m_p.Set(0, 0); //position, relative to body position
+        circleShape.m_radius = circleRadius;
+        body->CreateFixture(&circleShape, 1);
+        
+        /*Création du premier cercle SFML*/
+        sf::CircleShape sfCircleShape;
+        sfCircleShape.setRadius(SCALE*circleRadius);
+        pair<float, float> coordinates = pair<float, float>(0, 0);
+        pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
+        sfCircles.push_back(circle);
+        
         dead = false;
+        playing = false;
+        lives = 1;
     }
     
     Cloud() {
@@ -69,11 +83,11 @@ public:
     }
 
     void draw(sf::RenderWindow& window) {
-        sprite.setTexture(cloudTexture);
-        sprite.setOrigin(16.f, 16.f);
-        sprite.setPosition(SCALE * body->GetPosition().x, SCALE * body->GetPosition().y);
-        sprite.setRotation(body->GetAngle() * 180/b2_pi);
-        window.draw(sprite);
+        
+        for(auto c = sfCircles.begin() ; c < sfCircles.end() ; c++) {
+            c->first.setPosition(SCALE * (body->GetPosition().x - circleRadius - c->second.first), SCALE * (body->GetPosition().y - circleRadius + c->second.second));
+            window.draw(c->first);
+        }
     }
 
     float getPositionX() {
@@ -87,10 +101,18 @@ public:
     /*Fonction appelée lors de la mort du nuage. 
      Il s'arrête et se retourne sur le dos*/
     void kill() {
-        dead=true;
-        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), b2_pi);
-        body->SetLinearVelocity(b2Vec2(0,0));
-        body->SetType(b2_staticBody);
+        if(lives==1) {
+            dead=true;
+//            cout <<"cloud is dead" << endl;
+            body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
+            body->SetLinearVelocity(b2Vec2(0,0));
+            body->SetType(b2_staticBody);
+        } else if(lives > 1) {
+            body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
+            body->SetLinearVelocity(b2Vec2(velocityX,0));
+            sfCircles.pop_back();
+            lives--;
+        }
     }
 
     float getScore() {
@@ -104,11 +126,105 @@ public:
     }
     
     bool checkDead() {
-        if (body->GetLinearVelocity().x < velocityX) {
+        if (body->GetLinearVelocity().x < velocityX && playing) {
             this->kill();
             return true;
         }
         return false;
+    }
+    
+    void play() {
+        body->SetType(b2_dynamicBody);
+        body->SetLinearVelocity(b2Vec2(velocityX,savedSpeed));
+        playing = true;
+    }
+    
+    void pause() {
+        playing = false;
+        savedSpeed = body->GetLinearVelocity().y;
+        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), body->GetAngle());
+        body->SetLinearVelocity(b2Vec2(0,0));
+        body->SetType(b2_staticBody);
+    }
+    
+    void newCircle(float X, float Y) {
+        /*Création du cercle Box2D*/
+        b2CircleShape circleShape;
+        circleShape.m_p.Set(X, Y); //position, relative to body position
+        circleShape.m_radius = circleRadius;
+        body->CreateFixture(&circleShape, 1);
+        
+        /*Création du cercle SFML*/
+        pair<float, float> coordinates = pair<float, float>(-X, Y);
+        sf::CircleShape sfCircleShape;
+        sfCircleShape.setRadius(SCALE*circleRadius);
+        pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
+        sfCircles.push_back(circle);
+        
+        lives++;
+
+    }
+    
+    void saveCloudConfiguration() {
+        pugi::xml_document doc;
+        if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml")) cout << "Failed loading file" << endl;
+        pugi::xml_node clouds = doc.child("Saved").child("Clouds");
+        
+        /*Preparing the CloudConfiguration node*/
+        clouds.append_child("CloudConfiguration");
+        clouds.last_child().append_attribute("type").set_value("custom");
+        
+        for (auto c=sfCircles.begin() ; c<sfCircles.end() ; c++) {
+            clouds.last_child().append_child("Center");
+            clouds.last_child().last_child().append_attribute("X").set_value(to_string(c->second.first).c_str());
+            clouds.last_child().last_child().append_attribute("Y").set_value(to_string(c->second.second).c_str());
+        }
+        
+        doc.save_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml");
+    }
+    
+    
+    void loadCloudConfiguration(string name) {
+        pugi::xml_document doc;
+        if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml")) cout << "Failed loading file" << endl;
+        pugi::xml_node clouds = doc.child("Saved").child("Clouds");
+        
+        pugi::xml_node cloudConfig = clouds.find_child_by_attribute("CloudConfiguration", "name", name.c_str());
+        
+        /*Deleting previously written circles*/
+        sfCircles.clear();
+        lives = 0;
+        
+        pair<float, float> coordinates;
+        for (pugi::xml_node center: cloudConfig.children()) {
+            this->newCircle(stof(center.attribute("X").value()), stof(center.attribute("Y").value()));
+        }
+        
+        doc.save_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml");
+    }
+    
+    
+    /*** PROBLEME DE SCALE ***/
+    bool checkValidCircle(float X, float Y) {
+        pair<float, float> coordinates = pair<float, float>(-X, Y);
+        bool valid1 = false;
+        bool valid2 = true;
+        auto c = sfCircles.begin();
+        
+        /*Checking that the new circle is not too far from the others*/
+        while(!valid1 && c<sfCircles.end()) {
+            valid1 = (distanceBetween(c->second, coordinates) < 1.75*circleRadius);
+            c++;
+        }
+        
+        /*Checking that the new circle is not too close to the others*/
+        c = sfCircles.begin();
+        while(valid2 && c<sfCircles.end()) {
+            valid2 = (distanceBetween(c->second, coordinates) > 0.75*circleRadius);
+            c++;
+        }
+        
+        return (valid1 && valid2);
     }
     
 };
@@ -129,16 +245,22 @@ private:
     sf::Sprite sprite;
 public:
     Ground(b2World& world, float X) {
-        /*Selon la valeur de blockLength (modifiable dans parameters.xml)
+        /*Selon la valeur de blockLength (modifiable dans data.xml)
          Les blocks, grounds et ceillings s'adapteront et adapteront leur texture.*/
         bodyDef.position = b2Vec2(X/SCALE, 500.f/SCALE);
         bodyDef.type = b2_staticBody;
         body = world.CreateBody(&bodyDef);
         shape.SetAsBox((blockLength/2)/SCALE, (16.f/2)/SCALE);
         fixtureDef.density = 0.f;
+        fixtureDef.friction = 1.f;
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
         groundTexture.loadFromFile(resourcePath() + "ground.png");
+//        if(((int)(X/blockLength-0.5))%2 == 0) {
+//            groundTexture.loadFromFile(resourcePath() + "ground.png");
+//        } else {
+//            groundTexture.loadFromFile(resourcePath() + "ground2.png");
+//        }
         groundTexture.setRepeated(true);
         
         nbGrounds++;
@@ -180,6 +302,7 @@ public:
         body = world.CreateBody(&bodyDef);
         shape.SetAsBox((blockLength/2)/SCALE, (13.f/2)/SCALE);
         fixtureDef.density = 0.f;
+        fixtureDef.friction = 0.f;
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
         ceillingTexture.loadFromFile(resourcePath() + "ceilling.png");
@@ -226,16 +349,18 @@ public:
         body = world.CreateBody(&bodyDef);
         shape.SetAsBox((width/2)/SCALE, (height/2)/SCALE);
         fixtureDef.density = 0.f;
+        fixtureDef.friction = 1.f;
         fixtureDef.shape = &shape;
         body->CreateFixture(&fixtureDef);
         
         this->height = (height/2)/SCALE;
         this->width=(width/2)/SCALE;
-        
+        cout<<"Obstacle "<<this<<" instancié"<<endl;
         nbObstacles++;
     }
 
     ~Obstacle() {
+        cout<<"Obstacle "<<this<<" détruit"<<endl;
         nbObstacles--;
     }
     
@@ -256,6 +381,9 @@ private:
     mettre des limites au déplacement de l'obstacle*/
     float topLimit;
     float bottomLimit;
+    bool playing;
+    float savedSpeed;
+    
 public:
     Storm(b2World& world, float X, float Y): Obstacle(world, X, Y,  100.f, 100.f) {
         
@@ -270,12 +398,43 @@ public:
     }
     
     void updateVelocity() {
-        if (body->GetLinearVelocity().y > 0) {
-            if (body->GetPosition().y > topLimit/SCALE) body->SetLinearVelocity(b2Vec2(0, -stormVelocityY));
+        if(playing) {
+            /*If between topLimit and bottomLimit, keep the same speed*/
+            if(body->GetPosition().y < topLimit/SCALE && body->GetPosition().y > bottomLimit/SCALE) {
+                if(body->GetLinearVelocity().y > 0) {
+                    body->SetLinearVelocity(b2Vec2(0, stormVelocityY));
+                }
+                else {
+                    body->SetLinearVelocity(b2Vec2(0, -stormVelocityY));
+                }
+            }
+            else if(body->GetPosition().y > topLimit/SCALE) {
+                body->SetLinearVelocity(b2Vec2(0, -stormVelocityY));
+            }
+            else {
+                body->SetLinearVelocity(b2Vec2(0, stormVelocityY));
+            }
+            if (body->GetLinearVelocity().y > 0) {
+                if (body->GetPosition().y > topLimit/SCALE) body->SetLinearVelocity(b2Vec2(0, -stormVelocityY));
+            }
+            else if (body->GetPosition().y < bottomLimit/SCALE) body->SetLinearVelocity(b2Vec2(0, stormVelocityY));
         }
-        else if (body->GetPosition().y < bottomLimit/SCALE) body->SetLinearVelocity(b2Vec2(0, stormVelocityY));
+        else {
+            body->SetLinearVelocity(b2Vec2(0, 0));
+        }
     }
     
+    void pause() {
+        savedSpeed = body->GetLinearVelocity().y;
+        body->SetType(b2_staticBody);
+        playing = false;
+    }
+    
+    void play() {
+        body->SetType(b2_dynamicBody);
+        body->SetLinearVelocity(b2Vec2(0, savedSpeed));
+        playing = true;
+    }
 
 };
 
@@ -290,7 +449,7 @@ public:
     }
     
     void updateVelocity() {}
-
+    void playPause() {}
 };
 
 
@@ -314,14 +473,15 @@ public:
         ground = Ground(world, (N+0.5)*blockLength);
         ceilling = Ceilling(world, (N+0.5)*blockLength);
         nbBlocks+=1;
+        cout<<"Block "<<N<<" instancié"<<endl;
     }
 
     Block() {
-
+        cout<<"Block "<<N<<" créé"<<endl;
     }
 
     ~Block() {
-
+        cout<<"Block "<<N<<" détruit"<<endl;
         nbBlocks--;
     }
 
@@ -350,6 +510,18 @@ public:
     int getNbBlocks() {
         return nbBlocks;
     }
+    
+    void play() {
+        for (auto sto = storms.begin() ; sto<storms.end(); sto++) {
+            sto->play();
+        }
+    }
+    
+    void pause() {
+        for (auto sto = storms.begin() ; sto<storms.end(); sto++) {
+            sto->pause();
+        }
+    }
 };
 
 
@@ -360,7 +532,8 @@ private:
     b2World* world;
     int blockIndex;
     int bestScore;
-    vector<unique_ptr<Block>> blockPtrs; //Pointeurs vers les 3 blocks que l'on suit. A chaque création d'un block, on supprime le premier de la liste et on rajoute le nouveau à la fin
+    bool playing;
+    vector<unique_ptr<Block>> blockPtrs; //Pointeurs vers les 2 blocks que l'on suit. A chaque création d'un block, on supprime le premier de la liste et on rajoute le nouveau à la fin
     stringstream score;
     sf::Text sfScore;
     sf::Text sfGameOver;
@@ -375,7 +548,7 @@ public:
         gravity = b2Vec2(gravityX, gravityY);
         world = new b2World(gravity);
         cloud = Cloud(*world);
-        blockIndex = 0;
+        blockIndex = 1;
         
         /*Initialisation du premier triplet de blocks*/
         blockPtrs.push_back(make_unique<Block>(*world, -1));
@@ -390,6 +563,10 @@ public:
         sfScore.setFillColor(sf::Color::White);
         sfGameOver = sf::Text("Game Over!", font, 50);
         sfGameOver.setFillColor(sf::Color::White);
+        
+        cout << "New game built" << endl;
+        
+        playing = false;
     }
     
     void setStep(sf::Time elapsed) {
@@ -397,7 +574,9 @@ public:
     }
     
     void jumpCloud() {
-        cloud.jump();
+        if(playing) {
+            cloud.jump();
+        }
     }
     
     void SetGravity(b2Vec2 gravity) {
@@ -434,19 +613,19 @@ public:
         if (!cloud.checkDead()) {
             pugi::xml_document doc;
             
-            if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/parameters.xml")) cout << "Failed loading file" << endl;
-            bestScore = stoi(doc.child("Parameters").child("Score").attribute("BestScore").value());
+            if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml")) cout << "Failed loading file" << endl;
+            bestScore = stoi(doc.child("Saved").child("Score").attribute("BestScore").value());
             
             
-            cout<<"bestScore = "<<bestScore<<" et cloud.getPositionX()/scoreCoeff = "<<cloud.getScore()<<endl;
+            //cout<<"bestScore = "<<bestScore<<" et cloud.getPositionX()/scoreCoeff = "<<cloud.getScore()<<endl;
             if (bestScore<cloud.getScore() && cloud.getScore()>0) {
                 bestScore = cloud.getScore();
                 cout << "New best score" <<endl;
 //                doc.child("Score").attribute("BestScore").value() = bestScore;
-                doc.child("Parameters").child("Score").attribute("BestScore").set_value(to_string(bestScore).c_str());
-                cout<<"Done : "<<doc.child("Parameters").child("Score").attribute("BestScore").value()<<endl;
+                doc.child("Saved").child("Score").attribute("BestScore").set_value(to_string(bestScore).c_str());
+                cout<<"Done : "<<doc.child("Saved").child("Score").attribute("BestScore").value()<<endl;
                 cout<<"to_string(bestScore) = "<<to_string(bestScore)<<endl;
-                doc.save_file("../../../../../../../../FlappyCloud/Flappy Cloud/parameters.xml");
+                doc.save_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml");
 //                doc.child("Score").find_attribute("BestScore").set_value(bestScore);
             }
         }
@@ -457,7 +636,7 @@ public:
         if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPositionX()) {
             /*Destruction du premier block puis ajout d'un nouveau en fin de vector blockPtrs*/
             blockPtrs.erase(blockPtrs.begin());
-            blockPtrs.push_back(make_unique<Block>(*world, blockIndex));
+            blockPtrs.push_back(make_unique<Block>(*world, blockIndex+1));
             blockIndex+=1;
         }
         return blockIndex%2==0;//returns true if blockIndex is eaven
@@ -470,7 +649,7 @@ public:
     void restart() {
         blockPtrs.erase(blockPtrs.begin());
         blockPtrs.erase(blockPtrs.begin());
-        blockPtrs.erase(blockPtrs.begin());
+//        blockPtrs.erase(blockPtrs.begin());
         
         loadVariables();
         gravity = b2Vec2(gravityX, gravityY);
@@ -482,8 +661,43 @@ public:
         /*Initialisation du premier triplet de blocks*/
         blockPtrs.push_back(make_unique<Block>(*world, -1));
         blockPtrs.push_back(make_unique<Block>(*world, 0));
-        blockPtrs.push_back(make_unique<Block>(*world, 1));
+//        blockPtrs.push_back(make_unique<Block>(*world, 1));
 
+    }
+    
+    void playPause() {
+        if (playing) {
+            cloud.pause();
+            blockPtrs[0]->pause();
+            blockPtrs[1]->pause();
+            blockPtrs[2]->pause();
+            playing = false;
+        } else {
+            cloud.play();
+            blockPtrs[0]->play();
+            blockPtrs[1]->play();
+            blockPtrs[2]->play();
+            playing = true;
+        }
+    }
+    
+    void newCircle(float X, float Y) {
+        if(cloud.checkValidCircle(X,Y)) {
+            cloud.newCircle(X,Y);
+        }
+    }
+    
+    void saveCloudConfiguration() {
+        cloud.saveCloudConfiguration();
+    }
+    
+    void loadCloudConfiguration(string name) {
+        cloud.loadCloudConfiguration(name);
+    }
+    
+    pair<float, float> getCloudPosition() {
+        pair<float, float> position = pair<float, float>(cloud.getPositionX(), cloud.getPositionY());
+        return position;
     }
 };
 
@@ -519,6 +733,16 @@ int main(int, char const**)
                 window.close();
             }
 
+            if (event.type == sf::Event::MouseButtonPressed) {
+                cout << sf::Mouse::getPosition().x << " ; " << sf::Mouse::getPosition().y << endl;
+                cout << game.getCloudPosition().first << " ; " << game.getCloudPosition().second << endl;
+                cout << window.getPosition().x << " ; " <<  window.getPosition().y << endl;
+                cout << "mouse clicked" << endl;
+                
+                game.newCircle((sf::Mouse::getPosition().x - 620)/SCALE, (sf::Mouse::getPosition().y - 92 - game.getCloudPosition().second*SCALE)/SCALE);
+                
+            }
+            
             // Escape pressed: exit
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
                 window.close();
@@ -529,10 +753,27 @@ int main(int, char const**)
             }
             
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
-//                game.restart();
+                cout << "building new game" << endl;
                 game.~Game();
                 new (&game) Game();
             }
+            
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
+                game.playPause();
+            }
+            
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::N) {
+                game.newCircle(1,1);
+            }
+            
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::S) {
+                game.saveCloudConfiguration();
+            }
+            
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::L) {
+                game.loadCloudConfiguration("square");
+            }
+            
 
             /*Pour changer les variables en cours de route*/
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return) {
@@ -563,6 +804,10 @@ int main(int, char const**)
     return EXIT_SUCCESS;
 }
 
+float distanceBetween(pair<float, float> a, pair<float, float> b) {
+    return sqrt((a.first - b.first) * (a.first - b.first) + (a.second - b.second) * (a.second - b.second));
+}
+
 int randomIntBetween(int inf, int sup) {
     static std::random_device rd;
     static std::default_random_engine engine(rd());
@@ -573,9 +818,11 @@ int randomIntBetween(int inf, int sup) {
 void loadVariables() {
     pugi::xml_document doc;
 
-    if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/parameters.xml")) cout << "Failed loading file" << endl;
+    if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml")) cout << "Failed loading file" << endl;
 
     pugi::xml_node parameters = doc.child("Parameters");
+    pugi::xml_node saved = doc.child("Saved");
+    
 
     gravityX=stof(parameters.child("Gravity").attribute("GravityX").value());
     gravityY=stof(parameters.child("Gravity").attribute("GravityY").value());
@@ -583,12 +830,13 @@ void loadVariables() {
     velocityY=stof(parameters.child("Velocity").attribute("VelocityY").value());
     stormVelocityY=stof(parameters.child("StormVelocity").attribute("StormVelocityY").value());
 
-    scoreCoeff=stof(parameters.child("Score").attribute("ScoreCoeff").value());
     timeStep=stof(parameters.child("Iterations").attribute("TimeStep").value());
     velocityIterations=stof(parameters.child("Iterations").attribute("VelocityIterations").value());
     positionIterations=stof(parameters.child("Iterations").attribute("PositionIterations").value());
     obstPerBlock=stoi(parameters.child("Blocks").attribute("ObstPerBlock").value());
     blockLength=stof(parameters.child("Blocks").attribute("BlockLength").value());
+    
+    scoreCoeff=stof(saved.child("Score").attribute("ScoreCoeff").value());
     
     epsilon=stof(parameters.child("Kill").attribute("Epsilon").value());
 }

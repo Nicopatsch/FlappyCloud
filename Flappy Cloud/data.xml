@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<Parameters>
+	<Gravity GravityX="0" GravityY="30.0" />
+	<Velocity VelocityX="10.0" VelocityY="-10.0" />
+	<StormVelocity StormVelocityY="5.0" />
+	<Iterations TimeStep="0.0167 " VelocityIterations="8.0" PositionIterations="3.0" />
+	<Blocks BlockLength="3000.0" ObstPerBlock="3" />
+	<Kill Epsilon="0.1" />
+</Parameters>
+<Saved>
+	<Score ScoreCoeff="10.0" BestScore="29" />
+	<Clouds>
+		<CloudConfiguration type="basic">
+			<Center X="0." Y="0." />
+		</CloudConfiguration>
+		<CloudConfiguration type="custom" name="cloud">
+			<Center X="0.000000" Y="0.000000" />
+			<Center X="-0.633333" Y="0.000000" />
+			<Center X="-1.366667" Y="0.033333" />
+			<Center X="-2.100000" Y="0.000000" />
+			<Center X="-0.400000" Y="-0.566667" />
+			<Center X="-1.133333" Y="-0.533333" />
+			<Center X="-1.800000" Y="-0.533333" />
+			<Center X="-0.233333" Y="0.600000" />
+			<Center X="-0.833333" Y="-1.100000" />
+			<Center X="-0.900000" Y="0.566667" />
+			<Center X="-1.733333" Y="0.633333" />
+		</CloudConfiguration>
+		<CloudConfiguration type="custom" name="helix">
+			<Center X="0.000000" Y="0.000000" />
+			<Center X="-0.533333" Y="0.000000" />
+			<Center X="-1.200000" Y="-0.166667" />
+			<Center X="-1.600000" Y="-0.833333" />
+			<Center X="0.466667" Y="-0.233333" />
+			<Center X="1.166667" Y="-0.400000" />
+			<Center X="1.833333" Y="-0.066667" />
+			<Center X="0.166667" Y="0.566667" />
+			<Center X="-0.000000" Y="1.266667" />
+			<Center X="-0.600000" Y="1.700000" />
+		</CloudConfiguration>
+		<CloudConfiguration type="custom" name="square">
+			<Center X="0." Y="0." />
+			<Center X="0." Y="-0.7" />
+			<Center X="0." Y="-1.4" />
+			<Center X="0." Y="-2.1" />
+			<Center X="-0.7" Y="-2.1" />
+			<Center X="-1.4" Y="-2.1" />
+			<Center X="-2.1" Y="-2.1" />
+			<Center X="-2.1" Y="-1.4" />
+			<Center X="-2.1" Y="-0.7" />
+			<Center X="-2.1" Y="-0." />
+			<Center X="-1.4" Y="0." />
+			<Center X="-0.7" Y="0." />
+		</CloudConfiguration>
+	</Clouds>
+</Saved>
