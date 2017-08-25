@@ -83,7 +83,6 @@ public:
 
 /*La classe Ceilling est très similaire à la classe Ground.
  Elle permet de créer les morceaux de plafond nuageux.*/
-static int nbCeillings = 0;
 class Ceilling {
 private:
     b2BodyDef bodyDef;
@@ -106,14 +105,17 @@ public:
         body->CreateFixture(&fixtureDef);
         ceillingTexture.loadFromFile(resourcePath() + "ceilling.png");
         ceillingTexture.setRepeated(true);
+        extern int nbCeillings;
         nbCeillings++;
     }
 
     Ceilling() {
+        extern int nbCeillings;
         nbCeillings++;
     }
 
     ~Ceilling() {
+        extern int nbCeillings;
         nbCeillings--;
     }
 
@@ -128,11 +130,9 @@ public:
 };
 
 
-/*Les obstacles sont de 2 types (classes dérivées).
- Encore une fois, on garde un compteur du nombre d'Obstacles créés*/
-static int nbObstacles = 0;
+/*Les obstacles sont de 2 types (classes dérivées)*/
 class Obstacle {
-protected: // Protected: objet de classe dérivée peut accéder à ses propres attributs déf dans la classe base
+protected: // Protected: tout objet de classe dérivée peut accéder à ses propres attributs déf dans la classe de base
     b2BodyDef bodyDef;
     b2Body* body;
     b2PolygonShape shape;
@@ -155,11 +155,13 @@ public:
         this->height = (height/2)/SCALE;
         this->width=(width/2)/SCALE;
         cout<<"Obstacle "<<this<<" instancié"<<endl;
+        extern int nbObstacles;
         nbObstacles++;
     }
 
     ~Obstacle() {
         cout<<"Obstacle "<<this<<" détruit"<<endl;
+        extern int nbObstacles;
         nbObstacles--;
     }
     
