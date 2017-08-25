@@ -11,6 +11,7 @@
 		09722B891F4F4F33000CF83C /* data.xml in Resources */ = {isa = PBXBuildFile; fileRef = 09722B881F4F4F33000CF83C /* data.xml */; };
 		09722B8E1F4F5D25000CF83C /* cloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B8D1F4F5D25000CF83C /* cloud.cpp */; };
 		09722B921F4F609A000CF83C /* basic_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B901F4F609A000CF83C /* basic_functions.cpp */; };
+		09EC02251F50ACDD00E266F6 /* ground.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09EC02231F50ACDD00E266F6 /* ground.cpp */; };
 		4522984A1EDD6DD100E78D32 /* ResourcePath.mm in Sources */ = {isa = PBXBuildFile; fileRef = 452298491EDD6DD100E78D32 /* ResourcePath.mm */; };
 		4522984D1EDD6DD100E78D32 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4522984C1EDD6DD100E78D32 /* main.cpp */; };
 		452298501EDD6DD100E78D32 /* cute_image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4522984F1EDD6DD100E78D32 /* cute_image.jpg */; };
@@ -97,6 +98,8 @@
 		09722B8F1F4F5F45000CF83C /* globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = globals.h; sourceTree = "<group>"; };
 		09722B901F4F609A000CF83C /* basic_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = basic_functions.cpp; sourceTree = "<group>"; };
 		09722B911F4F609A000CF83C /* basic_functions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = basic_functions.h; sourceTree = "<group>"; };
+		09EC02231F50ACDD00E266F6 /* ground.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ground.cpp; sourceTree = "<group>"; };
+		09EC02241F50ACDD00E266F6 /* ground.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ground.hpp; sourceTree = "<group>"; };
 		452298451EDD6DD100E78D32 /* TestFlappyCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestFlappyCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		452298481EDD6DD100E78D32 /* TestFlappyCloud-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestFlappyCloud-Info.plist"; sourceTree = "<group>"; };
 		452298491EDD6DD100E78D32 /* ResourcePath.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ResourcePath.mm; sourceTree = "<group>"; };
@@ -295,6 +298,8 @@
 				455C4CA41ED83FF300271814 /* main.cpp */,
 				09722B8C1F4F592F000CF83C /* cloud.h */,
 				09722B8D1F4F5D25000CF83C /* cloud.cpp */,
+				09EC02231F50ACDD00E266F6 /* ground.cpp */,
+				09EC02241F50ACDD00E266F6 /* ground.hpp */,
 				09722B911F4F609A000CF83C /* basic_functions.h */,
 				09722B901F4F609A000CF83C /* basic_functions.cpp */,
 				09722B8F1F4F5F45000CF83C /* globals.h */,
@@ -660,6 +665,7 @@
 				45F268F71ED84FA900372566 /* b2Joint.cpp in Sources */,
 				45F268E11ED84FA900372566 /* b2Math.cpp in Sources */,
 				45F268FC1ED84FA900372566 /* b2RevoluteJoint.cpp in Sources */,
+				09EC02251F50ACDD00E266F6 /* ground.cpp in Sources */,
 				45F268D71ED84FA900372566 /* b2Collision.cpp in Sources */,
 				45F268DD1ED84FA900372566 /* b2EdgeShape.cpp in Sources */,
 				45F268EF1ED84FA900372566 /* b2ContactSolver.cpp in Sources */,

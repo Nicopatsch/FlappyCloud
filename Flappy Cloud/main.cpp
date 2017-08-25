@@ -14,6 +14,7 @@
 #include "globals.h"
 #include "basic_functions.h"
 #include "cloud.h"
+#include "ground.hpp"
 
 using namespace std;
 using namespace pugi;
@@ -21,65 +22,6 @@ using namespace pugi;
 enum obstacleType {storm, tornado};
 
 
-
-
-
-/*La classe Ground permet de créer des morceaux de sol (un par block)*/
-class Ground {
-private:
-    b2BodyDef bodyDef;
-    b2Body* body;
-    b2PolygonShape shape;
-    b2FixtureDef fixtureDef;
-    sf::Texture groundTexture;
-    sf::Sprite sprite;
-    float blockLength;
-public:
-    Ground(b2World& world, float X, float blockLength) {
-        /*Selon la valeur de blockLength (modifiable dans data.xml)
-         Les blocks, grounds et ceillings s'adapteront et adapteront leur texture.*/
-        this->blockLength = blockLength;
-        bodyDef.position = b2Vec2(X/SCALE, 500.f/SCALE);
-        bodyDef.type = b2_staticBody;
-        body = world.CreateBody(&bodyDef);
-        shape.SetAsBox((blockLength/2)/SCALE, (16.f/2)/SCALE);
-        fixtureDef.density = 0.f;
-        fixtureDef.friction = 1.f;
-        fixtureDef.shape = &shape;
-        body->CreateFixture(&fixtureDef);
-        groundTexture.loadFromFile(resourcePath() + "ground.png");
-//        if(((int)(X/blockLength-0.5))%2 == 0) {
-//            groundTexture.loadFromFile(resourcePath() + "ground.png");
-//        } else {
-//            groundTexture.loadFromFile(resourcePath() + "ground2.png");
-//        }
-        groundTexture.setRepeated(true);
-        extern int nbGrounds;
-
-        nbGrounds++;
-    }
-
-    Ground() {
-        extern int nbGrounds;
-        cout << "nbGrounds: " << nbGrounds << endl;
-        nbGrounds++;
-    }
-
-    ~Ground() {
-        extern int nbGrounds;
-
-        nbGrounds--;
-    }
-
-    void draw(sf::RenderWindow& window) {
-        sprite.setTexture(groundTexture);
-        sprite.setOrigin(blockLength/2, 8.f);
-        sprite.setPosition(body->GetPosition().x * SCALE, body->GetPosition().y * SCALE);
-        sprite.setTextureRect(sf::IntRect(0,0,blockLength,128.f));
-        sprite.setRotation(180/b2_pi * body->GetAngle());
-        window.draw(sprite);
-    }
-};
 
 /*La classe Ceilling est très similaire à la classe Ground.
  Elle permet de créer les morceaux de plafond nuageux.*/
