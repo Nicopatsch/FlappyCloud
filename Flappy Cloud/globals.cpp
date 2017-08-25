@@ -20,5 +20,6 @@ int nbGrounds = 0;
 /*on garde un compteur du nombre d'Obstacle créés*/
 int nbObstacles = 0;
 
-
 int nbCeillings = 0;
+
+int nbBlocks = 0;

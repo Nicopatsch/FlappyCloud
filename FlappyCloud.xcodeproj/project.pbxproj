@@ -16,6 +16,7 @@
 		09EC022B1F50B05300E266F6 /* obstacle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09EC02291F50B05300E266F6 /* obstacle.cpp */; };
 		09EC022E1F50B1CB00E266F6 /* storm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09EC022C1F50B1CB00E266F6 /* storm.cpp */; };
 		09EC02311F50B33400E266F6 /* tornado.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09EC022F1F50B33400E266F6 /* tornado.cpp */; };
+		09EC02341F50B57000E266F6 /* block.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09EC02321F50B57000E266F6 /* block.cpp */; };
 		4522984A1EDD6DD100E78D32 /* ResourcePath.mm in Sources */ = {isa = PBXBuildFile; fileRef = 452298491EDD6DD100E78D32 /* ResourcePath.mm */; };
 		4522984D1EDD6DD100E78D32 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4522984C1EDD6DD100E78D32 /* main.cpp */; };
 		452298501EDD6DD100E78D32 /* cute_image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4522984F1EDD6DD100E78D32 /* cute_image.jpg */; };
@@ -112,6 +113,8 @@
 		09EC022D1F50B1CB00E266F6 /* storm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = storm.hpp; sourceTree = "<group>"; };
 		09EC022F1F50B33400E266F6 /* tornado.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tornado.cpp; sourceTree = "<group>"; };
 		09EC02301F50B33400E266F6 /* tornado.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tornado.hpp; sourceTree = "<group>"; };
+		09EC02321F50B57000E266F6 /* block.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block.cpp; sourceTree = "<group>"; };
+		09EC02331F50B57000E266F6 /* block.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = block.hpp; sourceTree = "<group>"; };
 		452298451EDD6DD100E78D32 /* TestFlappyCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestFlappyCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		452298481EDD6DD100E78D32 /* TestFlappyCloud-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestFlappyCloud-Info.plist"; sourceTree = "<group>"; };
 		452298491EDD6DD100E78D32 /* ResourcePath.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ResourcePath.mm; sourceTree = "<group>"; };
@@ -318,6 +321,8 @@
 				09EC022D1F50B1CB00E266F6 /* storm.hpp */,
 				09EC022F1F50B33400E266F6 /* tornado.cpp */,
 				09EC02301F50B33400E266F6 /* tornado.hpp */,
+				09EC02321F50B57000E266F6 /* block.cpp */,
+				09EC02331F50B57000E266F6 /* block.hpp */,
 				09722B911F4F609A000CF83C /* basic_functions.h */,
 				09722B901F4F609A000CF83C /* basic_functions.cpp */,
 				09722B8F1F4F5F45000CF83C /* globals.h */,
@@ -704,6 +709,7 @@
 				09EC02311F50B33400E266F6 /* tornado.cpp in Sources */,
 				45F268FA1ED84FA900372566 /* b2PrismaticJoint.cpp in Sources */,
 				45F268F31ED84FA900372566 /* b2PolygonContact.cpp in Sources */,
+				09EC02341F50B57000E266F6 /* block.cpp in Sources */,
 				45F268DF1ED84FA900372566 /* b2BlockAllocator.cpp in Sources */,
 				09EC022E1F50B1CB00E266F6 /* storm.cpp in Sources */,
 				45F268E51ED84FA900372566 /* b2Body.cpp in Sources */,

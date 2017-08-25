@@ -29,18 +29,6 @@ void loadVariables();
  depuis le fichier data.xml*/
 
 extern float SCALE;
-extern float gravityX, gravityY;
-extern float velocityY, velocityX;
-extern float scoreCoeff;
-extern float timeStep, velocityIterations, positionIterations;
-extern float blockLength; //Length of a block
-extern int obstPerBlock; //Number of each type of obstacles per block
-extern float stormVelocityY; // Storm objects vertical velocity (moving obstacles)
-extern float epsilon;
-
-
-//extern float circleRadius;
-//static float circleRadius = .5f;
 
 
 #endif /* globals_h */

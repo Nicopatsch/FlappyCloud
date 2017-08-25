@@ -19,103 +19,11 @@
 #include "obstacle.hpp"
 #include "storm.hpp"
 #include "tornado.hpp"
+#include "block.hpp"
 
 
 using namespace std;
 using namespace pugi;
-
-//enum obstacleType {storm, tornado};
-
-
-
-
-//class Tornado: public Obstacle {
-//private:
-//
-//public:
-//    Tornado(b2World& world, float X, float Y): Obstacle(world, X, Y,  100.f, 149.f) {
-//        texture.loadFromFile(resourcePath() + "tornado.png");
-//        sprite.setOrigin(50.f, 74.5f);
-//    }
-//    
-//    void updateVelocity() {}
-//    void playPause() {}
-//};
-
-
-static int nbBlocks = 0;
-class Block {
-private:
-    int N;
-    vector<Storm> storms = vector<Storm>();
-    vector<Tornado> tornadoes = vector<Tornado>();
-    Ground ground;
-    Ceilling ceilling;
-    int obstPerBlock;
-    float blockLength;
-public:
-    Block(b2World& world, int N, float stormVY, int obstPerBlock, float blockLength){
-        if(N!=-1){
-            for (int i=0 ; i<obstPerBlock ; i++) {
-                storms.push_back(Storm(world, N*blockLength+i*blockLength/obstPerBlock, 100, stormVY)); //Storms espacés de 1000m
-                tornadoes.push_back(Tornado(world, N*blockLength+(i+0.5)*blockLength/obstPerBlock, 400));
-            }
-        }
-        this->blockLength = blockLength;
-        this->N = N;
-        ground = Ground(world, (N+0.5)*blockLength, blockLength);
-        ceilling = Ceilling(world, (N+0.5)*blockLength, blockLength);
-        nbBlocks+=1;
-        cout<<"Block "<<N<<" instancié"<<endl;
-    }
-
-    Block() {
-        cout<<"Block "<<N<<" créé"<<endl;
-    }
-
-    ~Block() {
-        cout<<"Block "<<N<<" détruit"<<endl;
-        nbBlocks--;
-    }
-
-    void draw(sf::RenderWindow& window) {
-        ground.draw(window);
-
-        for (auto sto = storms.begin() ; sto<storms.end(); sto++) {
-            sto->updateVelocity();
-            sto->draw(window);
-        }
-        for (auto tor = tornadoes.begin() ; tor<tornadoes.end(); tor++) {
-            tor->draw(window);
-        }
-        ceilling.draw(window);
-    }
-    
-
-    float getPositionX() {
-        return (N+0.5)*blockLength;
-    }
-    
-    int getIndex() {
-        return N;
-    }
-
-    int getNbBlocks() {
-        return nbBlocks;
-    }
-    
-    void play() {
-        for (auto sto = storms.begin() ; sto<storms.end(); sto++) {
-            sto->play();
-        }
-    }
-    
-    void pause() {
-        for (auto sto = storms.begin() ; sto<storms.end(); sto++) {
-            sto->pause();
-        }
-    }
-};
 
 
 class Game{
