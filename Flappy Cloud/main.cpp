@@ -1,239 +1,29 @@
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
+
 #include <vector>
+#include "iostream"
 #include <sstream>
 #include <memory>
 #include <random>
 
 #include "ResourcePath.hpp"
-#include "cloud.cpp"
 #include "pugixml.hpp"
 #include "pugiconfig.hpp"
+
+#include "globals.h"
+#include "basic_functions.h"
+#include "cloud.h"
 
 using namespace std;
 using namespace pugi;
 
-float distanceBetween(pair<float, float> a, pair<float, float> b);
-int randomIntBetween(int inf, int sup);
-void loadVariables();
-
-/*Toutes les variables globales qui vont être initialisées
- depuis le fichier data.xml grâce à la fonction loadVariables()*/
-static float gravityX, gravityY;
-static float velocityY, velocityX;
-static float scoreCoeff;
-static float timeStep, velocityIterations, positionIterations;
-static float blockLength; //Length of a block
-static int obstPerBlock; //Number of each type of obstacles per block
-static float stormVelocityY; // Storm objects vertical velocity (moving obstacles)
-static float epsilon;
-
-
-static float circleRadius = .5f;
-
-
 enum obstacleType {storm, tornado};
 
-/*Cloud est la classe de notre nuage, instanciée à chaque nouveau jeu*/
-class Cloud {
-private:
-    b2BodyDef bodyDef;
-    b2Body* body;
-    sf::Sprite sprite;
-    float savedSpeed;
-    bool playing;
-    bool dead;
-    int lives;
-    int compteur;
-    
-    vector<pair<sf::CircleShape, pair<float, float>>> sfCircles; //vecteur dont chaque élement est une paire contenant first-le sf::CircleShape et en second une paire de coordonnées
-public:
-    Cloud(b2World& world)
-    {
-        /*Création du body Box2D*/
-        bodyDef.position = b2Vec2((-1000)/SCALE, 200/SCALE);
-        bodyDef.type = b2_staticBody;
-        bodyDef.fixedRotation =true;
-        body = world.CreateBody(&bodyDef);
-
-        /*Création du premier cercle Box2D*/
-        b2CircleShape circleShape;
-        circleShape.m_p.Set(0, 0); //position, relative to body position
-        circleShape.m_radius = circleRadius;
-        body->CreateFixture(&circleShape, 1);
-        
-        /*Création du premier cercle SFML*/
-        sf::CircleShape sfCircleShape;
-        sfCircleShape.setRadius(SCALE*circleRadius);
-        pair<float, float> coordinates = pair<float, float>(0, 0);
-        pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
-        sfCircles.push_back(circle);
-        
-        dead = false;
-        playing = false;
-        lives = 1;
-    }
-    
-    Cloud() {
-        //Constructeur par défaut (nécessaire de le déclarer, même vide)
-    }
-
-    void jump() {
-        body->SetLinearVelocity(b2Vec2(velocityX,velocityY));
-    }
-
-    void draw(sf::RenderWindow& window) {
-        
-        for(auto c = sfCircles.begin() ; c < sfCircles.end() ; c++) {
-            c->first.setPosition(SCALE * (body->GetPosition().x - circleRadius - c->second.first), SCALE * (body->GetPosition().y - circleRadius + c->second.second));
-            window.draw(c->first);
-        }
-    }
-
-    float getPositionX() {
-        return body->GetPosition().x;
-    }
-
-    float getPositionY() {
-        return body->GetPosition().y;
-    }
-    
-    /*Fonction appelée lors de la mort du nuage. 
-     Il s'arrête et se retourne sur le dos*/
-    void kill() {
-        if(lives==1) {
-            dead=true;
-//            cout <<"cloud is dead" << endl;
-            body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
-            body->SetLinearVelocity(b2Vec2(0,0));
-            body->SetType(b2_staticBody);
-        } else if(lives > 1) {
-            body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
-            body->SetLinearVelocity(b2Vec2(velocityX,0));
-            sfCircles.pop_back();
-            lives--;
-        }
-    }
-
-    float getScore() {
-        /*Le score est proportionnel à la distance parcourue,
-         au coefficient scoreCoeff prêt*/
-        return round(body->GetPosition().x/scoreCoeff);
-    }
-
-    bool isDead() {
-        return dead;
-    }
-    
-    bool checkDead() {
-        if (body->GetLinearVelocity().x < velocityX && playing) {
-            this->kill();
-            return true;
-        }
-        return false;
-    }
-    
-    void play() {
-        body->SetType(b2_dynamicBody);
-        body->SetLinearVelocity(b2Vec2(velocityX,savedSpeed));
-        playing = true;
-    }
-    
-    void pause() {
-        playing = false;
-        savedSpeed = body->GetLinearVelocity().y;
-        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), body->GetAngle());
-        body->SetLinearVelocity(b2Vec2(0,0));
-        body->SetType(b2_staticBody);
-    }
-    
-    void newCircle(float X, float Y) {
-        /*Création du cercle Box2D*/
-        b2CircleShape circleShape;
-        circleShape.m_p.Set(X, Y); //position, relative to body position
-        circleShape.m_radius = circleRadius;
-        body->CreateFixture(&circleShape, 1);
-        
-        /*Création du cercle SFML*/
-        pair<float, float> coordinates = pair<float, float>(-X, Y);
-        sf::CircleShape sfCircleShape;
-        sfCircleShape.setRadius(SCALE*circleRadius);
-        pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
-        sfCircles.push_back(circle);
-        
-        lives++;
-
-    }
-    
-    void saveCloudConfiguration() {
-        pugi::xml_document doc;
-        if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml")) cout << "Failed loading file" << endl;
-        pugi::xml_node clouds = doc.child("Saved").child("Clouds");
-        
-        /*Preparing the CloudConfiguration node*/
-        clouds.append_child("CloudConfiguration");
-        clouds.last_child().append_attribute("type").set_value("custom");
-        
-        for (auto c=sfCircles.begin() ; c<sfCircles.end() ; c++) {
-            clouds.last_child().append_child("Center");
-            clouds.last_child().last_child().append_attribute("X").set_value(to_string(c->second.first).c_str());
-            clouds.last_child().last_child().append_attribute("Y").set_value(to_string(c->second.second).c_str());
-        }
-        
-        doc.save_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml");
-    }
-    
-    
-    void loadCloudConfiguration(string name) {
-        pugi::xml_document doc;
-        if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml")) cout << "Failed loading file" << endl;
-        pugi::xml_node clouds = doc.child("Saved").child("Clouds");
-        
-        pugi::xml_node cloudConfig = clouds.find_child_by_attribute("CloudConfiguration", "name", name.c_str());
-        
-        /*Deleting previously written circles*/
-        sfCircles.clear();
-        lives = 0;
-        
-        pair<float, float> coordinates;
-        for (pugi::xml_node center: cloudConfig.children()) {
-            this->newCircle(stof(center.attribute("X").value()), stof(center.attribute("Y").value()));
-        }
-        
-        doc.save_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml");
-    }
-    
-    
-    /*** PROBLEME DE SCALE ***/
-    bool checkValidCircle(float X, float Y) {
-        pair<float, float> coordinates = pair<float, float>(-X, Y);
-        bool valid1 = false;
-        bool valid2 = true;
-        auto c = sfCircles.begin();
-        
-        /*Checking that the new circle is not too far from the others*/
-        while(!valid1 && c<sfCircles.end()) {
-            valid1 = (distanceBetween(c->second, coordinates) < 1.75*circleRadius);
-            c++;
-        }
-        
-        /*Checking that the new circle is not too close to the others*/
-        c = sfCircles.begin();
-        while(valid2 && c<sfCircles.end()) {
-            valid2 = (distanceBetween(c->second, coordinates) > 0.75*circleRadius);
-            c++;
-        }
-        
-        return (valid1 && valid2);
-    }
-    
-};
 
 
-/*Variable globale permettant garder un oeil 
- sur le nombre de grounds existant. Elle est incrémentée
- par Ground() et décrémentée par ~Ground().*/
-static int nbGrounds = 0;
+
+
 /*La classe Ground permet de créer des morceaux de sol (un par block)*/
 class Ground {
 private:
@@ -243,10 +33,12 @@ private:
     b2FixtureDef fixtureDef;
     sf::Texture groundTexture;
     sf::Sprite sprite;
+    float blockLength;
 public:
-    Ground(b2World& world, float X) {
+    Ground(b2World& world, float X, float blockLength) {
         /*Selon la valeur de blockLength (modifiable dans data.xml)
          Les blocks, grounds et ceillings s'adapteront et adapteront leur texture.*/
+        this->blockLength = blockLength;
         bodyDef.position = b2Vec2(X/SCALE, 500.f/SCALE);
         bodyDef.type = b2_staticBody;
         body = world.CreateBody(&bodyDef);
@@ -262,15 +54,20 @@ public:
 //            groundTexture.loadFromFile(resourcePath() + "ground2.png");
 //        }
         groundTexture.setRepeated(true);
-        
+        extern int nbGrounds;
+
         nbGrounds++;
     }
 
     Ground() {
+        extern int nbGrounds;
+        cout << "nbGrounds: " << nbGrounds << endl;
         nbGrounds++;
     }
 
     ~Ground() {
+        extern int nbGrounds;
+
         nbGrounds--;
     }
 
@@ -295,8 +92,10 @@ private:
     b2FixtureDef fixtureDef;
     sf::Texture ceillingTexture;
     sf::Sprite sprite;
+    float blockLength;
 public:
-    Ceilling(b2World& world, float X) {
+    Ceilling(b2World& world, float X, float blockLength) {
+        this->blockLength = blockLength;
         bodyDef.position = b2Vec2(X/SCALE, -13.f/SCALE);
         bodyDef.type = b2_staticBody;
         body = world.CreateBody(&bodyDef);
@@ -383,10 +182,12 @@ private:
     float bottomLimit;
     bool playing;
     float savedSpeed;
+    float stormVelocityY;
     
 public:
-    Storm(b2World& world, float X, float Y): Obstacle(world, X, Y,  100.f, 100.f) {
-        
+    Storm(b2World& world, float X, float Y, float stormVelocityY): Obstacle(world, X, Y,  100.f, 100.f) {
+        this->stormVelocityY=stormVelocityY;
+
         texture.loadFromFile(resourcePath() + "storm.png");
         sprite.setOrigin(50.f, 50.f);
         
@@ -461,17 +262,20 @@ private:
     vector<Tornado> tornadoes = vector<Tornado>();
     Ground ground;
     Ceilling ceilling;
+    int obstPerBlock;
+    float blockLength;
 public:
-    Block(b2World& world, int N){
+    Block(b2World& world, int N, float stormVY, int obstPerBlock, float blockLength){
         if(N!=-1){
             for (int i=0 ; i<obstPerBlock ; i++) {
-                storms.push_back(Storm(world, N*blockLength+i*blockLength/obstPerBlock, 100)); //Storms espacés de 1000m
+                storms.push_back(Storm(world, N*blockLength+i*blockLength/obstPerBlock, 100, stormVY)); //Storms espacés de 1000m
                 tornadoes.push_back(Tornado(world, N*blockLength+(i+0.5)*blockLength/obstPerBlock, 400));
             }
         }
+        this->blockLength = blockLength;
         this->N = N;
-        ground = Ground(world, (N+0.5)*blockLength);
-        ceilling = Ceilling(world, (N+0.5)*blockLength);
+        ground = Ground(world, (N+0.5)*blockLength, blockLength);
+        ceilling = Ceilling(world, (N+0.5)*blockLength, blockLength);
         nbBlocks+=1;
         cout<<"Block "<<N<<" instancié"<<endl;
     }
@@ -527,6 +331,18 @@ public:
 
 class Game{
 private:
+    //parametres de jeu
+    float gravityX, gravityY;
+    float velocityY, velocityX;
+    float scoreCoeff;
+    float velocityIterations, positionIterations;
+    float blockLength; //Length of a block
+    int obstPerBlock; //Number of each type of obstacles per block
+    float stormVelocityY; // Storm objects vertical velocity (moving obstacles)
+    float epsilon;
+
+    
+    
     Cloud cloud;
     b2Vec2 gravity;
     b2World* world;
@@ -542,18 +358,49 @@ private:
     
 public:
     Game() {
-        loadVariables();
+        /**** Load game parameters ****/
+        pugi::xml_document doc;
+        
+        if (!doc.load_file("data.xml")) cout << "(Loading game parameters) Failed loading file from path '" << (resourcePath()+"data.xml").c_str() << "'" << endl;
+        
+        pugi::xml_node parameters = doc.child("Parameters");
+        pugi::xml_node saved = doc.child("Saved");
+        
+        cout << parameters.child("Gravity").attribute("GravityY").value() << endl;
+        
+        /* paramètres pour Game */
+        gravityX=stof(parameters.child("Gravity").attribute("GravityX").value());
+        gravityY=stof(parameters.child("Gravity").attribute("GravityY").value());
+        velocityIterations=stof(parameters.child("Iterations").attribute("VelocityIterations").value());
+        positionIterations=stof(parameters.child("Iterations").attribute("PositionIterations").value());
+        
+        /* paramètres pour Cloud */
+        velocityX=stof(parameters.child("Velocity").attribute("VelocityX").value());
+        velocityY=stof(parameters.child("Velocity").attribute("VelocityY").value());
+        scoreCoeff=stof(saved.child("Score").attribute("ScoreCoeff").value());
+
+        /* paramètres pour Storm */
+        stormVelocityY=stof(parameters.child("StormVelocity").attribute("StormVelocityY").value());
+        
+        /* paramètres pour le main */
+        timeStep=stof(parameters.child("Iterations").attribute("TimeStep").value());
+        
+        /* paramètres pour Block */
+        obstPerBlock=stoi(parameters.child("Blocks").attribute("ObstPerBlock").value());
+        
+        /* paramètre blockLength: utilisé par Ceiling, Block et Ground */
+        blockLength=stof(parameters.child("Blocks").attribute("BlockLength").value());
         
         /** Prepare the world */
         gravity = b2Vec2(gravityX, gravityY);
         world = new b2World(gravity);
-        cloud = Cloud(*world);
+        cloud = Cloud(*world, velocityX, velocityY, scoreCoeff);
         blockIndex = 1;
         
         /*Initialisation du premier triplet de blocks*/
-        blockPtrs.push_back(make_unique<Block>(*world, -1));
-        blockPtrs.push_back(make_unique<Block>(*world, 0));
-        blockPtrs.push_back(make_unique<Block>(*world, 1));
+        blockPtrs.push_back(make_unique<Block>(*world, -1, stormVelocityY, obstPerBlock, blockLength));
+        blockPtrs.push_back(make_unique<Block>(*world, 0, stormVelocityY, obstPerBlock,blockLength));
+        blockPtrs.push_back(make_unique<Block>(*world, 1, stormVelocityY, obstPerBlock, blockLength));
         
         //Prepare the sfml score text
         if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
@@ -568,6 +415,8 @@ public:
         
         playing = false;
     }
+    
+    float timeStep;
     
     void setStep(sf::Time elapsed) {
         world->Step(elapsed.asSeconds(), velocityIterations, positionIterations);
@@ -613,7 +462,7 @@ public:
         if (!cloud.checkDead()) {
             pugi::xml_document doc;
             
-            if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml")) cout << "Failed loading file" << endl;
+            if (!doc.load_file("data.xml")) cout << "Failed loading file" << endl;
             bestScore = stoi(doc.child("Saved").child("Score").attribute("BestScore").value());
             
             
@@ -625,7 +474,7 @@ public:
                 doc.child("Saved").child("Score").attribute("BestScore").set_value(to_string(bestScore).c_str());
                 cout<<"Done : "<<doc.child("Saved").child("Score").attribute("BestScore").value()<<endl;
                 cout<<"to_string(bestScore) = "<<to_string(bestScore)<<endl;
-                doc.save_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml");
+                doc.save_file("data.xml");
 //                doc.child("Score").find_attribute("BestScore").set_value(bestScore);
             }
         }
@@ -636,7 +485,7 @@ public:
         if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPositionX()) {
             /*Destruction du premier block puis ajout d'un nouveau en fin de vector blockPtrs*/
             blockPtrs.erase(blockPtrs.begin());
-            blockPtrs.push_back(make_unique<Block>(*world, blockIndex+1));
+            blockPtrs.push_back(make_unique<Block>(*world, blockIndex+1, stormVelocityY, obstPerBlock, blockLength));
             blockIndex+=1;
         }
         return blockIndex%2==0;//returns true if blockIndex is eaven
@@ -651,17 +500,17 @@ public:
         blockPtrs.erase(blockPtrs.begin());
 //        blockPtrs.erase(blockPtrs.begin());
         
-        loadVariables();
+//        loadVariables();
         gravity = b2Vec2(gravityX, gravityY);
         world = new b2World(gravity);
         cloud.~Cloud();
-        cloud = Cloud(*world);
+        cloud = Cloud(*world, velocityX, velocityY, scoreCoeff);
         blockIndex = 0;
 
         /*Initialisation du premier triplet de blocks*/
-        blockPtrs.push_back(make_unique<Block>(*world, -1));
-        blockPtrs.push_back(make_unique<Block>(*world, 0));
-//        blockPtrs.push_back(make_unique<Block>(*world, 1));
+        blockPtrs.push_back(make_unique<Block>(*world, -1, stormVelocityY, obstPerBlock, blockLength));
+        blockPtrs.push_back(make_unique<Block>(*world, 0, stormVelocityY, obstPerBlock, blockLength));
+//        blockPtrs.push_back(make_unique<Block>(*world, 1, stormVelocityY, obstPerBlock, blockLength));
 
     }
     
@@ -710,7 +559,7 @@ int main(int, char const**)
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
     sf::View view(sf::FloatRect(0, 0, 800, 600));
-    window.setFramerateLimit(1/timeStep);
+    window.setFramerateLimit(1/game.timeStep);
     window.setView(view);
 
 
@@ -775,12 +624,12 @@ int main(int, char const**)
             }
             
 
-            /*Pour changer les variables en cours de route*/
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return) {
-                loadVariables();
-                b2Vec2 gravity(gravityX, gravityY);
-                game.SetGravity(gravity);
-            }
+//            /*Pour changer les variables en cours de route*/
+//            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return) {
+//                loadVariables();
+//                b2Vec2 gravity(gravityX, gravityY);
+//                game.SetGravity(gravity);
+//            }
         }
 
 
@@ -802,41 +651,4 @@ int main(int, char const**)
     }
 
     return EXIT_SUCCESS;
-}
-
-float distanceBetween(pair<float, float> a, pair<float, float> b) {
-    return sqrt((a.first - b.first) * (a.first - b.first) + (a.second - b.second) * (a.second - b.second));
-}
-
-int randomIntBetween(int inf, int sup) {
-    static std::random_device rd;
-    static std::default_random_engine engine(rd());
-    std::uniform_int_distribution<unsigned> distribution(inf, sup);
-    return distribution(engine);
-}
-
-void loadVariables() {
-    pugi::xml_document doc;
-
-    if (!doc.load_file("../../../../../../../../FlappyCloud/Flappy Cloud/data.xml")) cout << "Failed loading file" << endl;
-
-    pugi::xml_node parameters = doc.child("Parameters");
-    pugi::xml_node saved = doc.child("Saved");
-    
-
-    gravityX=stof(parameters.child("Gravity").attribute("GravityX").value());
-    gravityY=stof(parameters.child("Gravity").attribute("GravityY").value());
-    velocityX=stof(parameters.child("Velocity").attribute("VelocityX").value());
-    velocityY=stof(parameters.child("Velocity").attribute("VelocityY").value());
-    stormVelocityY=stof(parameters.child("StormVelocity").attribute("StormVelocityY").value());
-
-    timeStep=stof(parameters.child("Iterations").attribute("TimeStep").value());
-    velocityIterations=stof(parameters.child("Iterations").attribute("VelocityIterations").value());
-    positionIterations=stof(parameters.child("Iterations").attribute("PositionIterations").value());
-    obstPerBlock=stoi(parameters.child("Blocks").attribute("ObstPerBlock").value());
-    blockLength=stof(parameters.child("Blocks").attribute("BlockLength").value());
-    
-    scoreCoeff=stof(saved.child("Score").attribute("ScoreCoeff").value());
-    
-    epsilon=stof(parameters.child("Kill").attribute("Epsilon").value());
 }
