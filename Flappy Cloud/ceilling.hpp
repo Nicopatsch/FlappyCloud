@@ -1,13 +1,13 @@
 //
-//  ceiling.hpp
+//  ceilling.hpp
 //  FlappyCloud
 //
 //  Created by Olivier Freyssinet on 25/08/2017.
 //  Copyright © 2017 Appdea. All rights reserved.
 //
 
-#ifndef ceiling_hpp
-#define ceiling_hpp
+#ifndef ceilling_hpp
+#define ceilling_hpp
 
 #include <stdio.h>
 #include <SFML/Graphics.hpp>
@@ -41,4 +41,4 @@ public:
 
 
 
-#endif /* ceiling_hpp */
+#endif /* ceilling_hpp */

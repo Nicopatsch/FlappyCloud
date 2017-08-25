@@ -1,12 +1,12 @@
 //
-//  ceiling.cpp
+//  ceilling.cpp
 //  FlappyCloud
 //
 //  Created by Olivier Freyssinet on 25/08/2017.
 //  Copyright © 2017 Appdea. All rights reserved.
 //
 
-#include "ceiling.hpp"
+#include "ceilling.hpp"
 
 Ceilling::Ceilling(b2World& world, float X, float blockLength) {
     this->blockLength = blockLength;

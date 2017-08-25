@@ -15,61 +15,12 @@
 #include "basic_functions.h"
 #include "cloud.h"
 #include "ground.hpp"
+#include "ceilling.hpp"
 
 using namespace std;
 using namespace pugi;
 
-enum obstacleType {storm, tornado};
-
-
-
-/*La classe Ceilling est très similaire à la classe Ground.
- Elle permet de créer les morceaux de plafond nuageux.*/
-class Ceilling {
-private:
-    b2BodyDef bodyDef;
-    b2Body* body;
-    b2PolygonShape shape;
-    b2FixtureDef fixtureDef;
-    sf::Texture ceillingTexture;
-    sf::Sprite sprite;
-    float blockLength;
-public:
-    Ceilling(b2World& world, float X, float blockLength) {
-        this->blockLength = blockLength;
-        bodyDef.position = b2Vec2(X/SCALE, -13.f/SCALE);
-        bodyDef.type = b2_staticBody;
-        body = world.CreateBody(&bodyDef);
-        shape.SetAsBox((blockLength/2)/SCALE, (13.f/2)/SCALE);
-        fixtureDef.density = 0.f;
-        fixtureDef.friction = 0.f;
-        fixtureDef.shape = &shape;
-        body->CreateFixture(&fixtureDef);
-        ceillingTexture.loadFromFile(resourcePath() + "ceilling.png");
-        ceillingTexture.setRepeated(true);
-        extern int nbCeillings;
-        nbCeillings++;
-    }
-
-    Ceilling() {
-        extern int nbCeillings;
-        nbCeillings++;
-    }
-
-    ~Ceilling() {
-        extern int nbCeillings;
-        nbCeillings--;
-    }
-
-    void draw(sf::RenderWindow& window) {
-        sprite.setTexture(ceillingTexture);
-        sprite.setOrigin(blockLength/2, -13.f);
-        sprite.setPosition(body->GetPosition().x * SCALE, body->GetPosition().y * SCALE);
-        sprite.setTextureRect(sf::IntRect(0,0,blockLength,13.f));
-        sprite.setRotation(180/b2_pi * body->GetAngle());
-        window.draw(sprite);
-    }
-};
+//enum obstacleType {storm, tornado};
 
 
 /*Les obstacles sont de 2 types (classes dérivées)*/
