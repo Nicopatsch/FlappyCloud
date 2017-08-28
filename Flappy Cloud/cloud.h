@@ -32,10 +32,10 @@ private:
     b2BodyDef bodyDef;
     b2Body* body;
     sf::Sprite sprite;
-    float savedSpeed;
+    bool bouncingBack;
     bool dead;
     int lives;
-    int compteur;
+//    int compteur;
     float velocityY, velocityX;
     float scoreCoeff;
     
@@ -47,10 +47,10 @@ public:
     void draw(sf::RenderWindow& window);
     float getPositionX();
     float getPositionY();
-    void kill();
+    void damage();
     float getScore();
     bool isDead();
-    bool checkDead();
+    bool checkCollision();
     void newCircle(float X, float Y);
     void saveCloudConfiguration();
     void loadCloudConfiguration(string name);

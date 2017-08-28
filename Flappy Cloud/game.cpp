@@ -58,6 +58,9 @@ Game::Game() {
     sfScore.setFillColor(sf::Color::White);
     sfGameOver = sf::Text("Game Over!", font, 50);
     sfGameOver.setFillColor(sf::Color::White);
+    sfPause = sf::Text("Pause", font, 50);
+    sfPause.setFillColor(sf::Color::White);
+
     
     cout << "New game built" << endl;
     
@@ -106,7 +109,7 @@ void Game::draw(sf::RenderWindow& window) {
 }
 
 void Game::checkGameOver() {
-    if (!cloud.checkDead()) {
+    if (!cloud.checkCollision()) {
         pugi::xml_document doc;
         
         if (!doc.load_file("data.xml")) cout << "Failed loading file" << endl;

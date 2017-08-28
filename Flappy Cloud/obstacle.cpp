@@ -12,7 +12,8 @@ Obstacle::Obstacle(b2World& world, float X, float Y, float width, float height) 
     bodyDef.type = b2_kinematicBody;
     body = world.CreateBody(&bodyDef);
     shape.SetAsBox((width/2)/SCALE, (height/2)/SCALE);
-    fixtureDef.density = 0.f;
+//    fixtureDef.density = 0.f;
+    fixtureDef.restitution = 2.0f;
     fixtureDef.friction = 1.f;
     fixtureDef.shape = &shape;
     body->CreateFixture(&fixtureDef);

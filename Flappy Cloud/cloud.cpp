@@ -62,18 +62,16 @@ float Cloud::getPositionY() {
     return body->GetPosition().y;
 }
 
-/*Fonction appelée lors de la mort du nuage.
- Il s'arrête et se retourne sur le dos*/
-void Cloud::kill() {
+/*Enlève une vie ou tue le nuage*/
+void Cloud::damage() {
     if(lives==1) {
         dead=true;
-        //            cout <<"cloud is dead" << endl;
         body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
         body->SetLinearVelocity(b2Vec2(0,0));
         body->SetType(b2_staticBody);
     } else if(lives > 1) {
-        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
-        body->SetLinearVelocity(b2Vec2(velocityX,0));
+//        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
+//        body->SetLinearVelocity(b2Vec2(velocityX,0));
         sfCircles.pop_back();
         lives--;
     }
@@ -89,12 +87,18 @@ bool Cloud::isDead() {
     return dead;
 }
 
-bool Cloud::checkDead() {
-    if (body->GetLinearVelocity().x < velocityX) {
-        this->kill();
+bool Cloud::checkCollision() {
+    for (b2ContactEdge* edge = body->GetContactList(); edge; edge = edge->next) {
+        this->damage();
         return true;
     }
+
     return false;
+//    if (body->GetLinearVelocity().x < velocityX) {
+//        this->kill();
+//        return true;
+//    }
+//    return false;
 }
 
 

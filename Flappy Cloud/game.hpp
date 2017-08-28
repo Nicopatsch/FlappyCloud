@@ -57,6 +57,7 @@ private:
     stringstream score;
     sf::Text sfScore;
     sf::Text sfGameOver;
+    sf::Text sfPause;
     sf::Font font;
     
     
