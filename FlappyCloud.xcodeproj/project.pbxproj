@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		091AD4051F4F781B0093C0D7 /* globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 091AD4041F4F781B0093C0D7 /* globals.cpp */; };
+		091EF0BC1F54D30700B77216 /* data.xml in CopyFiles */ = {isa = PBXBuildFile; fileRef = 09722B881F4F4F33000CF83C /* data.xml */; };
 		09722B891F4F4F33000CF83C /* data.xml in Resources */ = {isa = PBXBuildFile; fileRef = 09722B881F4F4F33000CF83C /* data.xml */; };
 		09722B8E1F4F5D25000CF83C /* cloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B8D1F4F5D25000CF83C /* cloud.cpp */; };
 		09722B921F4F609A000CF83C /* basic_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B901F4F609A000CF83C /* basic_functions.cpp */; };
@@ -91,8 +92,9 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
 			dstPath = "";
-			dstSubfolderSpec = 16;
+			dstSubfolderSpec = 7;
 			files = (
+				091EF0BC1F54D30700B77216 /* data.xml in CopyFiles */,
 				09A4051E1F547D760066EF8F /* saved.xml in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

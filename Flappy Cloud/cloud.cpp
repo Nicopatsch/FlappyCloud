@@ -55,9 +55,9 @@ float Cloud::getPositionY() {
 void Cloud::damage() {
     if(lives==1) {
         dead=true;
-        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
-        body->SetLinearVelocity(b2Vec2(0,0));
-        body->SetType(b2_staticBody);
+//        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
+//        body->SetLinearVelocity(b2Vec2(0,0));
+//        body->SetType(b2_staticBody);
     } else if(lives > 1) {
 //        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
 //        body->SetLinearVelocity(b2Vec2(velocityX,0));

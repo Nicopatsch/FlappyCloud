@@ -73,7 +73,7 @@ void Game::setStep(sf::Time elapsed) {
 }
 
 void Game::jumpCloud() {
-    if(playing) {
+    if(playing && !cloud.isDead()) {
         cloud.jump();
     }
 }
