@@ -145,12 +145,12 @@ pair<float, float> Game::center() {
     return pair<float, float>(SCALE*cloud.getPositionX()+100, 300);
 }
 
+////// PAS UTILISÉ
 void Game::restart() {
     blockPtrs.erase(blockPtrs.begin());
     blockPtrs.erase(blockPtrs.begin());
     //        blockPtrs.erase(blockPtrs.begin());
     
-    //        loadVariables();
     gravity = b2Vec2(gravityX, gravityY);
     world = new b2World(gravity);
     cloud.~Cloud();
@@ -161,7 +161,8 @@ void Game::restart() {
     blockPtrs.push_back(make_unique<Block>(*world, -1, stormVelocityY, obstPerBlock, blockLength));
     blockPtrs.push_back(make_unique<Block>(*world, 0, stormVelocityY, obstPerBlock, blockLength));
     //        blockPtrs.push_back(make_unique<Block>(*world, 1, stormVelocityY, obstPerBlock, blockLength));
-    
+    started = false;
+
 }
 
 void Game::playPause() {
@@ -170,6 +171,7 @@ void Game::playPause() {
     } else {
         playing = true;
     }
+    started = true;
 }
 
 void Game::newCircle(float X, float Y) {
@@ -189,4 +191,16 @@ void Game::loadCloudConfiguration(string name) {
 pair<float, float> Game::getCloudPosition() {
     pair<float, float> position = pair<float, float>(cloud.getPositionX(), cloud.getPositionY());
     return position;
+}
+
+bool Game::getPlaying() {
+    return playing;
+}
+
+bool Game::getStarted() {
+    return started;
+}
+
+bool Game::setStarted(bool b) {
+    started=b;
 }

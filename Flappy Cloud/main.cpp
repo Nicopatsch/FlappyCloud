@@ -49,7 +49,7 @@ int main(int, char const**)
     while (window.isOpen())
     {
         sf::Time elapsed = clock.restart();
-        if (game.playing) {
+        if (game.getPlaying()) {
             game.setStep(elapsed);
             game.updateBlocks();
             game.checkGameOver();
@@ -65,27 +65,23 @@ int main(int, char const**)
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
-//                cout << "mouse clicked" << endl;
-                cout << "event.mouseButton.x : " << event.mouseButton.x << " event.mouseButton.y :" << event.mouseButton.y << endl;
-                cout << "game.getCloudPosition: " <<game.getCloudPosition().first << " ; " << game.getCloudPosition().second << endl;
-//                cout << "window.getPosition: " << window.getPosition().x << " ; " <<  window.getPosition().y << endl;
-                
-                
                 game.newCircle((event.mouseButton.x - 300)/SCALE, (event.mouseButton.y - game.getCloudPosition().second*SCALE)/SCALE);
                 
             }
             
-            // Escape pressed: exit
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
                 window.close();
             }
             
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
-                game.jumpCloud();
-            }
+                if (game.getStarted()){
+                    game.jumpCloud();
+                }
+                }
             
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
                 cout << "building new game" << endl;
+                game.setStarted(false);
                 game.~Game();
                 new (&game) Game();
             }
@@ -103,27 +99,16 @@ int main(int, char const**)
             }
             
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::L) {
-                game.loadCloudConfiguration("square");
+                if (!game.getStarted()) {
+                    cout << "loading square" << endl;
+                    game.loadCloudConfiguration("square");
+                }
             }
             
-
-//            /*Pour changer les variables en cours de route*/
-//            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return) {
-//                loadVariables();
-//                b2Vec2 gravity(gravityX, gravityY);
-//                game.SetGravity(gravity);
-//            }
         }
 
 
         window.clear(sf::Color(119, 185, 246));
-//        if (game.updateBlocks()) {
-//            window.clear(sf::Color(119, 185, 246));
-//        } else {
-//            window.clear(sf::Color::Blue);
-//        }
-//        game.updateBlocks();
-//        game.checkGameOver();
         game.draw(window);
         
         

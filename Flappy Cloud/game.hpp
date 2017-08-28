@@ -49,10 +49,8 @@ private:
     b2World* world;
     int blockIndex;
     int bestScore;
-public:
     bool playing;
-
-private:
+    bool started;
     vector<unique_ptr<Block>> blockPtrs; //Pointeurs vers les 2 blocks que l'on suit. A chaque création d'un block, on supprime le premier de la liste et on rajoute le nouveau à la fin
     stringstream score;
     sf::Text sfScore;
@@ -88,6 +86,12 @@ public:
     void saveCloudConfiguration();
     
     void loadCloudConfiguration(string name);
+    
+    bool getPlaying();
+    
+    bool getStarted();
+    
+    bool setStarted(bool b);
     
     pair<float, float> getCloudPosition();
 };
