@@ -14,8 +14,8 @@ Storm::Storm(b2World& world, float X, float Y, float stormVelocityY): Obstacle(w
     
     body->SetLinearVelocity(b2Vec2(0, randomIntBetween(-stormVelocityY ,stormVelocityY)));
     
-    topLimit = randomIntBetween(215, 400);
-    bottomLimit = randomIntBetween(35, 215);
+    topLimit = randomIntBetween(225, 400);
+    bottomLimit = randomIntBetween(50, 225);
     
 }
 

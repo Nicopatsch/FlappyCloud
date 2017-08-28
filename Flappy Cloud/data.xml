@@ -7,3 +7,6 @@
 	<Blocks BlockLength="3000.0" ObstPerBlock="3" />
 	<Kill Epsilon="0.1" />
 </Parameters>
+<Saved>
+	<Score ScoreCoeff="10.0" BestScore="29" />
+</Saved>

@@ -181,6 +181,6 @@ bool Cloud::checkValidCircle(float X, float Y) {
     }
     cout << "new circle not too far: " << valid1 << endl;
     cout << "new circle not too close: " << valid2 << endl;
-    return (!valid1 && valid2);
+    return (valid1 && valid2);
     //return false;
 }
