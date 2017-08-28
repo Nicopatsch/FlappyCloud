@@ -1,10 +1,7 @@
 //
 //  ground.hpp
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 25/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #ifndef ground_hpp
 #define ground_hpp

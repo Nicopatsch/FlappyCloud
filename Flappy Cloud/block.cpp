@@ -1,10 +1,7 @@
 //
 //  block.cpp
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 25/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #include "block.hpp"
 
@@ -60,17 +57,5 @@ int Block::getIndex() {
 int Block::getNbBlocks() {
     extern int nbBlocks;
     return nbBlocks;
-}
-
-void Block::play() {
-    for (auto sto = storms.begin() ; sto<storms.end(); sto++) {
-        sto->play();
-    }
-}
-
-void Block::pause() {
-    for (auto sto = storms.begin() ; sto<storms.end(); sto++) {
-        sto->pause();
-    }
 }
 

@@ -11,6 +11,8 @@
 		09722B891F4F4F33000CF83C /* data.xml in Resources */ = {isa = PBXBuildFile; fileRef = 09722B881F4F4F33000CF83C /* data.xml */; };
 		09722B8E1F4F5D25000CF83C /* cloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B8D1F4F5D25000CF83C /* cloud.cpp */; };
 		09722B921F4F609A000CF83C /* basic_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B901F4F609A000CF83C /* basic_functions.cpp */; };
+		09A4051C1F547D160066EF8F /* saved.xml in Resources */ = {isa = PBXBuildFile; fileRef = 09A4051B1F547D160066EF8F /* saved.xml */; };
+		09A4051E1F547D760066EF8F /* saved.xml in CopyFiles */ = {isa = PBXBuildFile; fileRef = 09A4051D1F547D760066EF8F /* saved.xml */; };
 		09EC02251F50ACDD00E266F6 /* ground.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09EC02231F50ACDD00E266F6 /* ground.cpp */; };
 		09EC02281F50AE6D00E266F6 /* ceilling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09EC02261F50AE6D00E266F6 /* ceilling.cpp */; };
 		09EC022B1F50B05300E266F6 /* obstacle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09EC02291F50B05300E266F6 /* obstacle.cpp */; };
@@ -87,10 +89,11 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		09EC021F1F50A70200E266F6 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
-			dstSubfolderSpec = 7;
+			dstSubfolderSpec = 16;
 			files = (
+				09A4051E1F547D760066EF8F /* saved.xml in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +107,8 @@
 		09722B8F1F4F5F45000CF83C /* globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = globals.h; sourceTree = "<group>"; };
 		09722B901F4F609A000CF83C /* basic_functions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = basic_functions.cpp; sourceTree = "<group>"; };
 		09722B911F4F609A000CF83C /* basic_functions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = basic_functions.h; sourceTree = "<group>"; };
+		09A4051B1F547D160066EF8F /* saved.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = saved.xml; sourceTree = "<group>"; };
+		09A4051D1F547D760066EF8F /* saved.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = saved.xml; sourceTree = "<group>"; };
 		09EC02231F50ACDD00E266F6 /* ground.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ground.cpp; sourceTree = "<group>"; };
 		09EC02241F50ACDD00E266F6 /* ground.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ground.hpp; sourceTree = "<group>"; };
 		09EC02261F50AE6D00E266F6 /* ceilling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ceilling.cpp; sourceTree = "<group>"; };
@@ -322,12 +327,12 @@
 				09EC02261F50AE6D00E266F6 /* ceilling.cpp */,
 				09EC022A1F50B05300E266F6 /* obstacle.hpp */,
 				09EC02291F50B05300E266F6 /* obstacle.cpp */,
-				09EC022C1F50B1CB00E266F6 /* storm.cpp */,
 				09EC022D1F50B1CB00E266F6 /* storm.hpp */,
-				09EC022F1F50B33400E266F6 /* tornado.cpp */,
+				09EC022C1F50B1CB00E266F6 /* storm.cpp */,
 				09EC02301F50B33400E266F6 /* tornado.hpp */,
-				09EC02321F50B57000E266F6 /* block.cpp */,
+				09EC022F1F50B33400E266F6 /* tornado.cpp */,
 				09EC02331F50B57000E266F6 /* block.hpp */,
+				09EC02321F50B57000E266F6 /* block.cpp */,
 				09722B911F4F609A000CF83C /* basic_functions.h */,
 				09722B901F4F609A000CF83C /* basic_functions.cpp */,
 				09722B8F1F4F5F45000CF83C /* globals.h */,
@@ -352,6 +357,8 @@
 		455C4CA61ED83FF300271814 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				09A4051D1F547D760066EF8F /* saved.xml */,
+				09A4051B1F547D160066EF8F /* saved.xml */,
 				09722B881F4F4F33000CF83C /* data.xml */,
 				45F269011ED8500700372566 /* box.png */,
 				4579EE2B1EDB46BC009BDB15 /* cloud.png */,
@@ -629,6 +636,7 @@
 				09722B891F4F4F33000CF83C /* data.xml in Resources */,
 				45D4B9661EF27E310082A079 /* ground2.png in Resources */,
 				457FCE6A1EE9A857006D1863 /* tornado.png in Resources */,
+				09A4051C1F547D160066EF8F /* saved.xml in Resources */,
 				457FCE621EE9A1EE006D1863 /* ceilling.png in Resources */,
 				455E14F41EDC81A6004E9EC1 /* storm.png in Resources */,
 				455C4CAE1ED83FF300271814 /* icon.png in Resources */,

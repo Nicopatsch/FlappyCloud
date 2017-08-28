@@ -1,10 +1,7 @@
 //
 //  cloud.h
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 24/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #ifndef cloud_h
 #define cloud_h
@@ -36,7 +33,6 @@ private:
     b2Body* body;
     sf::Sprite sprite;
     float savedSpeed;
-    bool playing;
     bool dead;
     int lives;
     int compteur;
@@ -55,8 +51,6 @@ public:
     float getScore();
     bool isDead();
     bool checkDead();
-    void play();
-    void pause();
     void newCircle(float X, float Y);
     void saveCloudConfiguration();
     void loadCloudConfiguration(string name);

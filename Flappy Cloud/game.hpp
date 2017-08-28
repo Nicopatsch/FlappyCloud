@@ -1,10 +1,7 @@
 //
 //  game.hpp
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 25/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #ifndef game_hpp
 #define game_hpp
@@ -52,7 +49,10 @@ private:
     b2World* world;
     int blockIndex;
     int bestScore;
+public:
     bool playing;
+
+private:
     vector<unique_ptr<Block>> blockPtrs; //Pointeurs vers les 2 blocks que l'on suit. A chaque création d'un block, on supprime le premier de la liste et on rajoute le nouveau à la fin
     stringstream score;
     sf::Text sfScore;

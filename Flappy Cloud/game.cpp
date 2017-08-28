@@ -1,10 +1,7 @@
 //
 //  game.cpp
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 25/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #include "game.hpp"
 
@@ -18,8 +15,6 @@ Game::Game() {
     
     pugi::xml_node parameters = doc.child("Parameters");
     pugi::xml_node saved = doc.child("Saved");
-    
-    cout << parameters.child("Gravity").attribute("GravityY").value() << endl;
     
     /* paramètres pour Game */
     gravityX=stof(parameters.child("Gravity").attribute("GravityX").value());
@@ -140,7 +135,7 @@ bool Game::updateBlocks() {
         blockPtrs.push_back(make_unique<Block>(*world, blockIndex+1, stormVelocityY, obstPerBlock, blockLength));
         blockIndex+=1;
     }
-    return blockIndex%2==0;//returns true if blockIndex is eaven
+    return blockIndex%2==0;//returns true if blockIndex is even
 }
 
 pair<float, float> Game::center() {
@@ -168,16 +163,8 @@ void Game::restart() {
 
 void Game::playPause() {
     if (playing) {
-        cloud.pause();
-        blockPtrs[0]->pause();
-        blockPtrs[1]->pause();
-        blockPtrs[2]->pause();
         playing = false;
     } else {
-        cloud.play();
-        blockPtrs[0]->play();
-        blockPtrs[1]->play();
-        blockPtrs[2]->play();
         playing = true;
     }
 }

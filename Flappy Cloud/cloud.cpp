@@ -1,14 +1,12 @@
 //
 //  cloud.cpp
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 24/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #include "cloud.h"
 
-static float circleRadius = .5f;
+
+static float circleRadius = .5;
 
 Cloud::Cloud(b2World& world, float velocityX, float velocityY, float scoreCoeff)
 {
@@ -18,9 +16,10 @@ Cloud::Cloud(b2World& world, float velocityX, float velocityY, float scoreCoeff)
     
     /*Création du body Box2D*/
     bodyDef.position = b2Vec2((-1000)/SCALE, 200/SCALE);
-    bodyDef.type = b2_staticBody;
+    bodyDef.type = b2_dynamicBody;
     bodyDef.fixedRotation =true;
     body = world.CreateBody(&bodyDef);
+    body->SetLinearVelocity(b2Vec2(velocityX, 0));
     
     /*Création du premier cercle Box2D*/
     b2CircleShape circleShape;
@@ -36,7 +35,6 @@ Cloud::Cloud(b2World& world, float velocityX, float velocityY, float scoreCoeff)
     sfCircles.push_back(circle);
     
     dead = false;
-    playing = false;
     lives = 1;
 }
 
@@ -92,26 +90,13 @@ bool Cloud::isDead() {
 }
 
 bool Cloud::checkDead() {
-    if (body->GetLinearVelocity().x < velocityX && playing) {
+    if (body->GetLinearVelocity().x < velocityX) {
         this->kill();
         return true;
     }
     return false;
 }
 
-void Cloud::play() {
-    body->SetType(b2_dynamicBody);
-    body->SetLinearVelocity(b2Vec2(velocityX,savedSpeed));
-    playing = true;
-}
-
-void Cloud::pause() {
-    playing = false;
-    savedSpeed = body->GetLinearVelocity().y;
-    body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), body->GetAngle());
-    body->SetLinearVelocity(b2Vec2(0,0));
-    body->SetType(b2_staticBody);
-}
 
 void Cloud::newCircle(float X, float Y) {
     /*Création du cercle Box2D*/
@@ -133,7 +118,7 @@ void Cloud::newCircle(float X, float Y) {
 
 void Cloud::saveCloudConfiguration() {
     pugi::xml_document doc;
-    if (!doc.load_file("data.xml")) cout << "Failed loading file" << endl;
+    if (!doc.load_file("saved.xml")) cout << "Failed loading file" << endl;
     pugi::xml_node clouds = doc.child("Saved").child("Clouds");
     
     /*Preparing the CloudConfiguration node*/
@@ -146,13 +131,13 @@ void Cloud::saveCloudConfiguration() {
         clouds.last_child().last_child().append_attribute("Y").set_value(to_string(c->second.second).c_str());
     }
     
-    doc.save_file("data.xml");
+    doc.save_file("saved.xml");
 }
 
 
 void Cloud::loadCloudConfiguration(string name) {
     pugi::xml_document doc;
-    if (!doc.load_file("data.xml")) cout << "Failed loading file" << endl;
+    if (!doc.load_file("saved.xml")) cout << "Failed loading file" << endl;
     pugi::xml_node clouds = doc.child("Saved").child("Clouds");
     
     pugi::xml_node cloudConfig = clouds.find_child_by_attribute("CloudConfiguration", "name", name.c_str());
@@ -166,7 +151,7 @@ void Cloud::loadCloudConfiguration(string name) {
         this->newCircle(stof(center.attribute("X").value()), stof(center.attribute("Y").value()));
     }
     
-    doc.save_file("data.xml");
+    doc.save_file("saved.xml");
 }
 
 
@@ -181,6 +166,7 @@ bool Cloud::checkValidCircle(float X, float Y) {
     while(!valid1 && c<sfCircles.end()) {
         valid1 = (distanceBetween(c->second, coordinates) < 1.75*circleRadius);
         c++;
+        cout << distanceBetween(c->second, coordinates) << endl;
     }
     
     /*Checking that the new circle is not too close to the others*/
@@ -189,6 +175,8 @@ bool Cloud::checkValidCircle(float X, float Y) {
         valid2 = (distanceBetween(c->second, coordinates) > 0.75*circleRadius);
         c++;
     }
-    
-    return (valid1 && valid2);
+    cout << "new circle not too far: " << valid1 << endl;
+    cout << "new circle not too close: " << valid2 << endl;
+    return (!valid1 && valid2);
+    //return false;
 }

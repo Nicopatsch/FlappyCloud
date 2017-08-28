@@ -1,10 +1,7 @@
 //
 //  basic_functions.h
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 24/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #ifndef basic_functions_h
 #define basic_functions_h

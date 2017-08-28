@@ -1,10 +1,7 @@
 //
 //  globals.h
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 24/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #ifndef globals_h
 #define globals_h

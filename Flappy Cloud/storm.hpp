@@ -1,10 +1,7 @@
 //
 //  storm.hpp
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 25/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #ifndef storm_hpp
 #define storm_hpp
@@ -31,7 +28,6 @@ private:
      mettre des limites au déplacement de l'obstacle*/
     float topLimit;
     float bottomLimit;
-    bool playing;
     float savedSpeed;
     float stormVelocityY;
     
@@ -40,9 +36,6 @@ public:
     
     void updateVelocity();
     
-    void pause();
-    
-    void play();
 };
 
 

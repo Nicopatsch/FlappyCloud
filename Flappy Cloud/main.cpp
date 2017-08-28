@@ -23,6 +23,7 @@
 #include "game.hpp"
 
 
+
 using namespace std;
 using namespace pugi;
 
@@ -48,7 +49,11 @@ int main(int, char const**)
     while (window.isOpen())
     {
         sf::Time elapsed = clock.restart();
-        game.setStep(elapsed);
+        if (game.playing) {
+            game.setStep(elapsed);
+            game.updateBlocks();
+            game.checkGameOver();
+        }
 
         // Process events
         sf::Event event;
@@ -60,10 +65,11 @@ int main(int, char const**)
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
-                cout << sf::Mouse::getPosition().x << " ; " << sf::Mouse::getPosition().y << endl;
-                cout << game.getCloudPosition().first << " ; " << game.getCloudPosition().second << endl;
-                cout << window.getPosition().x << " ; " <<  window.getPosition().y << endl;
                 cout << "mouse clicked" << endl;
+                cout << "sf::Mouse::getPosition: " << sf::Mouse::getPosition().x << " ; " << sf::Mouse::getPosition().y << endl;
+                cout << "game.getCloudPosition: " <<game.getCloudPosition().first << " ; " << game.getCloudPosition().second << endl;
+                cout << "window.getPosition: " << window.getPosition().x << " ; " <<  window.getPosition().y << endl;
+                
                 
                 game.newCircle((sf::Mouse::getPosition().x - 620)/SCALE, (sf::Mouse::getPosition().y - 92 - game.getCloudPosition().second*SCALE)/SCALE);
                 
@@ -116,8 +122,8 @@ int main(int, char const**)
 //        } else {
 //            window.clear(sf::Color::Blue);
 //        }
-        game.updateBlocks();
-        game.checkGameOver();
+//        game.updateBlocks();
+//        game.checkGameOver();
         game.draw(window);
         
         
@@ -129,3 +135,6 @@ int main(int, char const**)
 
     return EXIT_SUCCESS;
 }
+
+
+

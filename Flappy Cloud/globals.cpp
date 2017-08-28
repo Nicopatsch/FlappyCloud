@@ -1,10 +1,7 @@
 //
 //  globals.cpp
 //  FlappyCloud
-//
-//  Created by Olivier Freyssinet on 24/08/2017.
-//  Copyright © 2017 Appdea. All rights reserved.
-//
+
 
 #include "globals.h"
 
