@@ -21,18 +21,7 @@ Cloud::Cloud(b2World& world, float velocityX, float velocityY, float scoreCoeff)
     body = world.CreateBody(&bodyDef);
     body->SetLinearVelocity(b2Vec2(velocityX, 0));
     
-    /*Création du premier cercle Box2D*/
-    b2CircleShape circleShape;
-    circleShape.m_p.Set(0, 0); //position, relative to body position
-    circleShape.m_radius = circleRadius;
-    body->CreateFixture(&circleShape, 1);
-    
-    /*Création du premier cercle SFML*/
-    sf::CircleShape sfCircleShape;
-    sfCircleShape.setRadius(SCALE*circleRadius);
-    pair<float, float> coordinates = pair<float, float>(0, 0);
-    pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
-    sfCircles.push_back(circle);
+    newCircle(0, 0);
     
     dead = false;
     lives = 1;
@@ -108,7 +97,6 @@ void Cloud::newCircle(float X, float Y) {
     circleShape.m_p.Set(X, Y); //position, relative to body position
     circleShape.m_radius = circleRadius;
     body->CreateFixture(&circleShape, 1);
-    
     /*Création du cercle SFML*/
     pair<float, float> coordinates = pair<float, float>(-X, Y);
     sf::CircleShape sfCircleShape;
@@ -170,6 +158,7 @@ bool Cloud::checkValidCircle(float X, float Y) {
     while(!valid1 && c<sfCircles.end()) {
         valid1 = (distanceBetween(c->second, coordinates) < 1.75*circleRadius);
         c++;
+        cout << "circle checked:" << c->second.first << "," << c->second.second <<endl;
         cout << distanceBetween(c->second, coordinates) << endl;
     }
     

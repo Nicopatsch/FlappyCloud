@@ -65,13 +65,13 @@ int main(int, char const**)
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
-                cout << "mouse clicked" << endl;
-                cout << "event.mouseButton.x ; y : " << event.mouseButton.x << " ; " << event.mouseButton.y << endl;
+//                cout << "mouse clicked" << endl;
+                cout << "event.mouseButton.x : " << event.mouseButton.x << " event.mouseButton.y :" << event.mouseButton.y << endl;
                 cout << "game.getCloudPosition: " <<game.getCloudPosition().first << " ; " << game.getCloudPosition().second << endl;
-                cout << "window.getPosition: " << window.getPosition().x << " ; " <<  window.getPosition().y << endl;
+//                cout << "window.getPosition: " << window.getPosition().x << " ; " <<  window.getPosition().y << endl;
                 
                 
-                game.newCircle((event.mouseButton.x)/SCALE, (event.mouseButton.y - game.getCloudPosition().second*SCALE)/SCALE);
+                game.newCircle((event.mouseButton.x - 300)/SCALE, (event.mouseButton.y - game.getCloudPosition().second*SCALE)/SCALE);
                 
 //                game.newCircle((sf::Mouse::getPosition().x - 620)/SCALE, (sf::Mouse::getPosition().y - 92 - game.getCloudPosition().second*SCALE)/SCALE);
                 
