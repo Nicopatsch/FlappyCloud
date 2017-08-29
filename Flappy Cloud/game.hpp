@@ -29,8 +29,10 @@
 #include "storm.hpp"
 #include "tornado.hpp"
 #include "block.hpp"
+#include "contactListener.hpp"
 
-class Game{
+
+class Game {
 private:
     //parametres de jeu
     float gravityX, gravityY;

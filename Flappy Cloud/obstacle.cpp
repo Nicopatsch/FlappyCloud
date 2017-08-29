@@ -10,6 +10,7 @@
 Obstacle::Obstacle(b2World& world, float X, float Y, float width, float height) {
     bodyDef.position = b2Vec2(X/SCALE, Y/SCALE);
     bodyDef.type = b2_kinematicBody;
+    bodyDef.userData = this;
     body = world.CreateBody(&bodyDef);
     shape.SetAsBox((width/2)/SCALE, (height/2)/SCALE);
 //    fixtureDef.density = 0.f;

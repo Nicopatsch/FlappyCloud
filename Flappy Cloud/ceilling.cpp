@@ -9,6 +9,7 @@ Ceilling::Ceilling(b2World& world, float X, float blockLength) {
     this->blockLength = blockLength;
     bodyDef.position = b2Vec2(X/SCALE, -13.f/SCALE);
     bodyDef.type = b2_staticBody;
+    bodyDef.userData = this;
     body = world.CreateBody(&bodyDef);
     shape.SetAsBox((blockLength/2)/SCALE, (13.f/2)/SCALE);
     fixtureDef.density = 0.f;
@@ -38,4 +39,8 @@ void Ceilling::draw(sf::RenderWindow& window) {
     sprite.setTextureRect(sf::IntRect(0,0,blockLength,13.f));
     sprite.setRotation(180/b2_pi * body->GetAngle());
     window.draw(sprite);
+}
+
+gameEntityType Ceilling::getGameEntityType() {
+    return gEntityType;
 }

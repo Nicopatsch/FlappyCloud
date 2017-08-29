@@ -22,6 +22,7 @@
  Elle permet de créer les morceaux de plafond nuageux.*/
 class Ceilling {
 private:
+    gameEntityType gEntityType = ceilling;
     b2BodyDef bodyDef;
     b2Body* body;
     b2PolygonShape shape;
@@ -34,6 +35,9 @@ public:
     Ceilling();
     ~Ceilling();
     void draw(sf::RenderWindow& window);
+    
+    gameEntityType getGameEntityType();
+
 };
 
 

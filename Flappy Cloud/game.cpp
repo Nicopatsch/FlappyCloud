@@ -42,6 +42,8 @@ Game::Game() {
     /** Prepare the world */
     gravity = b2Vec2(gravityX, gravityY);
     world = new b2World(gravity);
+    ContactListener contactListener;
+    //world->SetContactListener(&contactListener);
     cloud = Cloud(*world, velocityX, velocityY, scoreCoeff);
     blockIndex = 1;
     
@@ -208,4 +210,6 @@ bool Game::setStarted(bool b) {
 float Game::getTimeStep() {
     return timeStep;
 }
+
+
 

@@ -21,11 +21,10 @@ using namespace std;
 
 void loadVariables();
 
-
-/*Toutes les variables globales qui vont être initialisées
- depuis le fichier data.xml*/
-
 extern float SCALE;
+
+enum gameEntityType { ceilling, ground, cloud, storm, tornado, rainbow };
+
 
 
 #endif /* globals_h */

@@ -14,3 +14,6 @@ Tornado::Tornado(b2World& world, float X, float Y): Obstacle(world, X, Y,  100.f
 void Tornado::updateVelocity() {}
 //void Tornado::playPause() {}
 
+gameEntityType Tornado::getGameEntityType() {
+    return gEntityType;
+}

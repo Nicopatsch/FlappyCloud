@@ -14,11 +14,14 @@
 
 class Tornado: public Obstacle {
 private:
+    gameEntityType gEntityType = tornado;
     
 public:
     Tornado(b2World& world, float X, float Y);
     void updateVelocity();
 //    void playPause();
+    gameEntityType getGameEntityType();
+
 };
 
 

@@ -39,3 +39,7 @@ void Storm::updateVelocity() {
     }
     else if (body->GetPosition().y < bottomLimit/SCALE) body->SetLinearVelocity(b2Vec2(0, stormVelocityY));
 }
+
+string Storm::getGameEntityType() {
+    return "I'm a storm";
+}

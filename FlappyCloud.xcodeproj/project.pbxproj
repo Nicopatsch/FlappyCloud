@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		091AD4051F4F781B0093C0D7 /* globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 091AD4041F4F781B0093C0D7 /* globals.cpp */; };
 		091EF0BC1F54D30700B77216 /* data.xml in CopyFiles */ = {isa = PBXBuildFile; fileRef = 09722B881F4F4F33000CF83C /* data.xml */; };
+		096A4B321F559370000614E7 /* contactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 096A4B301F559370000614E7 /* contactListener.cpp */; };
 		09722B891F4F4F33000CF83C /* data.xml in Resources */ = {isa = PBXBuildFile; fileRef = 09722B881F4F4F33000CF83C /* data.xml */; };
 		09722B8E1F4F5D25000CF83C /* cloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B8D1F4F5D25000CF83C /* cloud.cpp */; };
 		09722B921F4F609A000CF83C /* basic_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B901F4F609A000CF83C /* basic_functions.cpp */; };
@@ -103,6 +104,8 @@
 
 /* Begin PBXFileReference section */
 		091AD4041F4F781B0093C0D7 /* globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = globals.cpp; sourceTree = "<group>"; };
+		096A4B301F559370000614E7 /* contactListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = contactListener.cpp; sourceTree = "<group>"; };
+		096A4B311F559370000614E7 /* contactListener.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = contactListener.hpp; sourceTree = "<group>"; };
 		09722B881F4F4F33000CF83C /* data.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = data.xml; sourceTree = "<group>"; };
 		09722B8C1F4F592F000CF83C /* cloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cloud.h; sourceTree = "<group>"; };
 		09722B8D1F4F5D25000CF83C /* cloud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cloud.cpp; sourceTree = "<group>"; };
@@ -335,6 +338,8 @@
 				09EC022F1F50B33400E266F6 /* tornado.cpp */,
 				09EC02331F50B57000E266F6 /* block.hpp */,
 				09EC02321F50B57000E266F6 /* block.cpp */,
+				096A4B301F559370000614E7 /* contactListener.cpp */,
+				096A4B311F559370000614E7 /* contactListener.hpp */,
 				09722B911F4F609A000CF83C /* basic_functions.h */,
 				09722B901F4F609A000CF83C /* basic_functions.cpp */,
 				09722B8F1F4F5F45000CF83C /* globals.h */,
@@ -751,6 +756,7 @@
 				45F268FF1ED84FA900372566 /* b2WheelJoint.cpp in Sources */,
 				09EC022B1F50B05300E266F6 /* obstacle.cpp in Sources */,
 				45F268EC1ED84FA900372566 /* b2ChainAndPolygonContact.cpp in Sources */,
+				096A4B321F559370000614E7 /* contactListener.cpp in Sources */,
 				45F268FB1ED84FA900372566 /* b2PulleyJoint.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

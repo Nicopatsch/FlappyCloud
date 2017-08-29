@@ -4,6 +4,7 @@
 
 
 #include "cloud.h"
+#include "storm.hpp"
 
 
 static float circleRadius = .5;
@@ -18,6 +19,7 @@ Cloud::Cloud(b2World& world, float velocityX, float velocityY, float scoreCoeff)
     bodyDef.position = b2Vec2((-1000)/SCALE, 200/SCALE);
     bodyDef.type = b2_dynamicBody;
     bodyDef.fixedRotation = true;
+    bodyDef.userData = this;
     body = world.CreateBody(&bodyDef);
     body->SetLinearVelocity(b2Vec2(velocityX, 0));
     
@@ -152,7 +154,6 @@ void Cloud::loadCloudConfiguration(string name) {
 }
 
 
-/*** PROBLEME DE SCALE ***/
 bool Cloud::checkValidCircle(float X, float Y) {
     pair<float, float> coordinates = pair<float, float>(-X, Y);
     bool valid1 = false;
@@ -178,3 +179,10 @@ bool Cloud::checkValidCircle(float X, float Y) {
     return (valid1 && valid2);
     //return false;
 }
+
+string Cloud::getGameEntityType() {
+//    return gEntityType;
+    return "I'm a Cloud";
+
+}
+

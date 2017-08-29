@@ -24,6 +24,7 @@
  est qu'ils translatent aléatoirement de haut en bas*/
 class Storm: public Obstacle {
 private:
+    gameEntityType gEntityType = storm;
     /*Variables privées propres à Storm permettant de
      mettre des limites au déplacement de l'obstacle*/
     float topLimit;
@@ -36,6 +37,8 @@ public:
     
     void updateVelocity();
     
+    string getGameEntityType();
+
 };
 
 

@@ -29,6 +29,7 @@ using namespace pugi;
 /*Cloud est la classe de notre nuage, instanciée à chaque nouveau jeu*/
 class Cloud {
 private:
+    gameEntityType gEntityType = cloud;
     b2BodyDef bodyDef;
     b2Body* body;
     sf::Sprite sprite;
@@ -55,6 +56,8 @@ public:
     void saveCloudConfiguration();
     void loadCloudConfiguration(string name);
     bool checkValidCircle(float X, float Y);
+
+    string getGameEntityType();
 };
 
 #endif /* cloud_h */

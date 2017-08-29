@@ -22,6 +22,7 @@
 /*La classe Ground permet de créer des morceaux de sol (un par block)*/
 class Ground {
 private:
+    gameEntityType gEntityType = ground;
     b2BodyDef bodyDef;
     b2Body* body;
     b2PolygonShape shape;
@@ -34,6 +35,9 @@ public:
     Ground();
     ~Ground();
     void draw(sf::RenderWindow& window);
+    
+    gameEntityType getGameEntityType();
+
 };
 
 
