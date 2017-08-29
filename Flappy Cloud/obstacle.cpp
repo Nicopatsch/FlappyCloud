@@ -21,13 +21,13 @@ Obstacle::Obstacle(b2World& world, float X, float Y, float width, float height) 
     
     this->height = (height/2)/SCALE;
     this->width=(width/2)/SCALE;
-    cout<<"Obstacle "<<this<<" instancié"<<endl;
+//    cout<<"Obstacle "<<this<<" instancié"<<endl;
     extern int nbObstacles;
     nbObstacles++;
 }
 
 Obstacle::~Obstacle() {
-    cout<<"Obstacle "<<this<<" détruit"<<endl;
+//    cout<<"Obstacle "<<this<<" détruit"<<endl;
     extern int nbObstacles;
     nbObstacles--;
 }

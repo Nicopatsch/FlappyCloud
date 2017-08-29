@@ -31,6 +31,7 @@ private:
     int N;
     vector<Storm> storms = vector<Storm>();
     vector<Tornado> tornadoes = vector<Tornado>();
+    vector<Rainbow> rainbows = vector<Rainbow>();
     Ground ground;
     Ceilling ceilling;
     Rainbow rainbow;
@@ -45,12 +46,12 @@ public:
     
     void draw(sf::RenderWindow& window);
     
-    
     float getPositionX();
     
     int getIndex();
     
     int getNbBlocks();
+    
     
 };
 

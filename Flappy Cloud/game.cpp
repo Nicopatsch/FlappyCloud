@@ -167,7 +167,7 @@ pair<float, float> Game::center() {
     return pair<float, float>(SCALE*cloud.getPositionX()+100, 300);
 }
 
-////// PAS UTILISÉ
+////// FONCTION PAS UTILISÉE
 void Game::restart() {
     blockPtrs.erase(blockPtrs.begin());
     blockPtrs.erase(blockPtrs.begin());
@@ -228,6 +228,7 @@ bool Game::setStarted(bool b) {
 float Game::getTimeStep() {
     return timeStep;
 }
+
 
 
 

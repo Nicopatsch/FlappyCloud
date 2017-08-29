@@ -77,7 +77,7 @@ void Cloud::damage() {
         b2Fixture fixtureList = *body->GetFixtureList();
         while(fixtureList.GetNext()) {
             fixtureList = *fixtureList.GetNext();
-            cout << &fixtureList << endl;
+//            cout << &fixtureList << endl;
         }
         fixtureList.~b2Fixture();
         lives--;
@@ -94,11 +94,44 @@ bool Cloud::isDead() {
     return dead;
 }
 
+/* Le rôle de cette fonction est d'examiner à chaque instant la liste de contacts dans lequels 
+ notre Cloud est impliqué.
+A partir de cette liste, cette fonction va permettre:
+    - soit de donner une vie au nuage si le contact se fait avec un body ayant la priorité Sensor (seuls les Rainbow ont cette priorité)
+    - soit d'endommager le nuage dans les autres cas
+ */
 bool Cloud::checkCollision() {
+    //
     for (b2ContactEdge* edge = body->GetContactList(); edge; edge = edge->next) {
         
         if (!inCollision){
-            this->damage();
+            
+            bool collisionWithASensor=false;
+            
+            b2Body* fixtureABody = edge->contact->GetFixtureA()->GetBody();
+            
+            for (b2Fixture* f = fixtureABody->GetFixtureList(); f; f=f->GetNext()) {
+                if (f->IsSensor()) {
+                    collisionWithASensor=true;
+                }
+            };
+            
+            b2Body* fixtureBBody = edge->contact->GetFixtureB()->GetBody();
+            
+            for (b2Fixture* f = fixtureBBody->GetFixtureList(); f; f=f->GetNext()) {
+                if (f->IsSensor()) {
+                    collisionWithASensor=true;
+                }
+            };
+            
+            if (collisionWithASensor) {
+                //cout << "contact avec un sensor" << endl;
+                this->addLife();
+            }
+            else {
+                //cout << "contact avec AUTRE" << endl;
+                this->damage();
+            }
         }
         inCollision = true;
         return true;
@@ -199,7 +232,6 @@ bool Cloud::checkValidCircle(float X, float Y) {
 }
 
 string Cloud::getGameEntityType() {
-//    return gEntityType;
     return "I'm a Cloud";
 
 }
@@ -209,21 +241,22 @@ int Cloud::getLives() {
 }
 
 bool Cloud::addLife() {
-    if (lives<10) {
-        if (circles[lives].first!=0 || circles[lives].second!=0) {
-            /*Création du cercle Box2D*/
-            b2CircleShape circleShape;
-            circleShape.m_p.Set(circles[lives].first, circles[lives].second); //position, relative to body position
-            circleShape.m_radius = circleRadius;
-            body->CreateFixture(&circleShape, 1);
-            /*Création du cercle SFML*/
-            pair<float, float> coordinates = pair<float, float>(-circles[lives].first, circles[lives].second);
-            sf::CircleShape sfCircleShape;
-            sfCircleShape.setRadius(SCALE*circleRadius);
-            pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
-            sfCircles.push_back(circle);
-
-        }
-    }
+    cout << "appel de Cloud::addLife()" << endl;
+//    if (lives<10) {
+//        if (circles[lives].first!=0 || circles[lives].second!=0) {
+//            /*Création du cercle Box2D*/
+//            b2CircleShape circleShape;
+//            circleShape.m_p.Set(circles[lives].first, circles[lives].second); //position, relative to body position
+//            circleShape.m_radius = circleRadius;
+//            body->CreateFixture(&circleShape, 1);
+//            /*Création du cercle SFML*/
+//            pair<float, float> coordinates = pair<float, float>(-circles[lives].first, circles[lives].second);
+//            sf::CircleShape sfCircleShape;
+//            sfCircleShape.setRadius(SCALE*circleRadius);
+//            pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
+//            sfCircles.push_back(circle);
+//
+//        }
+//    }
 }
 

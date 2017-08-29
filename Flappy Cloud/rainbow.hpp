@@ -26,14 +26,11 @@ private:
     b2FixtureDef fixtureDef;
     sf::CircleShape sfCircle;
     float radius = .5;
-    Cloud* cloud;
-    float X, Y;
     
 public:
-    Rainbow(b2World& world, Cloud* cloud, float X, float Y);
+    Rainbow(b2World& world, float X, float Y);
     Rainbow();
     ~Rainbow();
-    void checkCollisionWithCloud();
     void draw(sf::RenderWindow& window);
     
 };
