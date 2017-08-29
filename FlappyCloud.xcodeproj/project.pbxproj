@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		091AD4051F4F781B0093C0D7 /* globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 091AD4041F4F781B0093C0D7 /* globals.cpp */; };
 		096A4B321F559370000614E7 /* contactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 096A4B301F559370000614E7 /* contactListener.cpp */; };
+		096A4B351F55CADB000614E7 /* rainbow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 096A4B331F55CADB000614E7 /* rainbow.cpp */; };
 		09722B891F4F4F33000CF83C /* data.xml in Resources */ = {isa = PBXBuildFile; fileRef = 09722B881F4F4F33000CF83C /* data.xml */; };
 		09722B8E1F4F5D25000CF83C /* cloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B8D1F4F5D25000CF83C /* cloud.cpp */; };
 		09722B921F4F609A000CF83C /* basic_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 09722B901F4F609A000CF83C /* basic_functions.cpp */; };
@@ -113,6 +114,8 @@
 		091AD4041F4F781B0093C0D7 /* globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = globals.cpp; sourceTree = "<group>"; };
 		096A4B301F559370000614E7 /* contactListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = contactListener.cpp; sourceTree = "<group>"; };
 		096A4B311F559370000614E7 /* contactListener.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = contactListener.hpp; sourceTree = "<group>"; };
+		096A4B331F55CADB000614E7 /* rainbow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rainbow.cpp; sourceTree = "<group>"; };
+		096A4B341F55CADB000614E7 /* rainbow.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = rainbow.hpp; sourceTree = "<group>"; };
 		09722B881F4F4F33000CF83C /* data.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = data.xml; sourceTree = "<group>"; };
 		09722B8C1F4F592F000CF83C /* cloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cloud.h; sourceTree = "<group>"; };
 		09722B8D1F4F5D25000CF83C /* cloud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cloud.cpp; sourceTree = "<group>"; };
@@ -350,6 +353,8 @@
 				09EC022F1F50B33400E266F6 /* tornado.cpp */,
 				09EC02331F50B57000E266F6 /* block.hpp */,
 				09EC02321F50B57000E266F6 /* block.cpp */,
+				096A4B331F55CADB000614E7 /* rainbow.cpp */,
+				096A4B341F55CADB000614E7 /* rainbow.hpp */,
 				096A4B301F559370000614E7 /* contactListener.cpp */,
 				096A4B311F559370000614E7 /* contactListener.hpp */,
 				09722B911F4F609A000CF83C /* basic_functions.h */,
@@ -758,6 +763,7 @@
 				45F268E51ED84FA900372566 /* b2Body.cpp in Sources */,
 				45F268E61ED84FA900372566 /* b2ContactManager.cpp in Sources */,
 				45F268DA1ED84FA900372566 /* b2TimeOfImpact.cpp in Sources */,
+				096A4B351F55CADB000614E7 /* rainbow.cpp in Sources */,
 				45F268D41ED84FA900372566 /* b2CollideCircle.cpp in Sources */,
 				45F268FE1ED84FA900372566 /* b2WeldJoint.cpp in Sources */,
 				45F268D81ED84FA900372566 /* b2Distance.cpp in Sources */,
