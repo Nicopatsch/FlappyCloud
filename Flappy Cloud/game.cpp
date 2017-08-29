@@ -45,12 +45,11 @@ Game::Game() {
     ContactListener contactListener;
     //world->SetContactListener(&contactListener);
     cloud = Cloud(*world, velocityX, velocityY, scoreCoeff);
-    blockIndex = 1;
+    blockIndex = 0;
     
     /*Initialisation du premier triplet de blocks*/
     blockPtrs.push_back(make_unique<Block>(*world, -1, stormVelocityY, obstPerBlock, blockLength));
     blockPtrs.push_back(make_unique<Block>(*world, 0, stormVelocityY, obstPerBlock,blockLength));
-    blockPtrs.push_back(make_unique<Block>(*world, 1, stormVelocityY, obstPerBlock, blockLength));
     
     //Prepare the sfml score text
     if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
@@ -62,7 +61,19 @@ Game::Game() {
     sfGameOver.setFillColor(sf::Color::White);
     sfPause = sf::Text("Pause", font, 50);
     sfPause.setFillColor(sf::Color::White);
-
+    
+    sfLives = sf::Text(to_string(cloud.getLives()), font, 30);
+    sfLives.setFillColor(sf::Color::White);
+    
+    heartTextures = vector<sf::Texture>();
+    for(int i=0 ; i<5 ; i++) {
+        heartTextures.push_back(sf::Texture());
+    }
+    heartTextures[0].loadFromFile(resourcePath() + "heart1.png");
+    heartTextures[1].loadFromFile(resourcePath() + "heart2.png");
+    heartTextures[2].loadFromFile(resourcePath() + "heart3.png");
+    heartTextures[3].loadFromFile(resourcePath() + "heart4.png");
+    heartTextures[4].loadFromFile(resourcePath() + "heart5.png");
     
     cout << "New game built" << endl;
     
@@ -88,7 +99,6 @@ void Game::draw(sf::RenderWindow& window) {
     cloud.draw(window);
     blockPtrs[0]->draw(window);
     blockPtrs[1]->draw(window);
-    blockPtrs[2]->draw(window);
     
     /*Draw the score (only if not dead)*/
     score.str("");
@@ -108,6 +118,11 @@ void Game::draw(sf::RenderWindow& window) {
         window.draw(sfGameOver);
     }
     
+    string livesText = to_string(cloud.getLives());
+    sfLives.setString(livesText);
+    sfLives.setPosition((cloud.getPositionX())*SCALE-200, 40);
+    heart.setSize(sf::Vector2f(118, 89));
+    window.draw(sfLives);
 }
 
 void Game::checkGameOver() {
@@ -151,7 +166,6 @@ pair<float, float> Game::center() {
 void Game::restart() {
     blockPtrs.erase(blockPtrs.begin());
     blockPtrs.erase(blockPtrs.begin());
-    //        blockPtrs.erase(blockPtrs.begin());
     
     gravity = b2Vec2(gravityX, gravityY);
     world = new b2World(gravity);
@@ -162,7 +176,6 @@ void Game::restart() {
     /*Initialisation du premier triplet de blocks*/
     blockPtrs.push_back(make_unique<Block>(*world, -1, stormVelocityY, obstPerBlock, blockLength));
     blockPtrs.push_back(make_unique<Block>(*world, 0, stormVelocityY, obstPerBlock, blockLength));
-    //        blockPtrs.push_back(make_unique<Block>(*world, 1, stormVelocityY, obstPerBlock, blockLength));
     started = false;
 
 }
@@ -177,7 +190,7 @@ void Game::playPause() {
 }
 
 void Game::newCircle(float X, float Y) {
-    if(cloud.checkValidCircle(X,Y)) {
+    if(cloud.checkValidCircle(X,Y) && cloud.getLives() < 10) {
         cloud.newCircle(X,Y);
     }
 }
