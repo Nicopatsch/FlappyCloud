@@ -15,7 +15,7 @@ Obstacle::Obstacle(b2World& world, float X, float Y, float width, float height) 
     shape.SetAsBox((width/2)/SCALE, (height/2)/SCALE);
 //    fixtureDef.density = 0.f;
     fixtureDef.restitution = 2.0f;
-    fixtureDef.friction = 1.f;
+    fixtureDef.friction = 0.f;
     fixtureDef.shape = &shape;
     body->CreateFixture(&fixtureDef);
     

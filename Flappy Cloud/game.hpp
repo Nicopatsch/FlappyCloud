@@ -54,12 +54,19 @@ private:
     bool playing;
     bool started;
     vector<unique_ptr<Block>> blockPtrs; //Pointeurs vers les 2 blocks que l'on suit. A chaque création d'un block, on supprime le premier de la liste et on rajoute le nouveau à la fin
+    
+    //Pour l'affichage du score
     stringstream score;
     sf::Text sfScore;
     sf::Text sfGameOver;
     sf::Text sfPause;
     sf::Font font;
     
+    //Pour l'affichage du nombre de vies
+    sf::Text sfLives;
+    sf::RectangleShape heart;
+    sf::Sprite heartSprite;
+    vector<sf::Texture> heartTextures;
     
 public:
     Game();

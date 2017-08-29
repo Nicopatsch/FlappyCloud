@@ -56,6 +56,7 @@ public:
     void saveCloudConfiguration();
     void loadCloudConfiguration(string name);
     bool checkValidCircle(float X, float Y);
+    int getLives();
 
     string getGameEntityType();
 };

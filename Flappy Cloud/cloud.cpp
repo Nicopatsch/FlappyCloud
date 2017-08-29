@@ -39,6 +39,14 @@ void Cloud::jump() {
 
 void Cloud::draw(sf::RenderWindow& window) {
     
+    //Limiting the velocity to velocityX and velocityY
+    if(abs(body->GetLinearVelocity().x) > velocityX) {
+        body->SetLinearVelocity(b2Vec2(velocityX * (1-2*(body->GetLinearVelocity().x<0)),body->GetLinearVelocity().y));
+    }
+    if(abs(body->GetLinearVelocity().y) > 2 * abs(velocityY)) {
+        body->SetLinearVelocity(b2Vec2(body->GetLinearVelocity().x, 2 * abs(velocityY) * (1-2*(body->GetLinearVelocity().y<0))));
+    }
+    
     for(auto c = sfCircles.begin() ; c < sfCircles.end() ; c++) {
         c->first.setPosition(SCALE * (body->GetPosition().x - circleRadius - c->second.first), SCALE * (body->GetPosition().y - circleRadius + c->second.second));
         window.draw(c->first);
@@ -57,9 +65,10 @@ float Cloud::getPositionY() {
 void Cloud::damage() {
     if(lives==1) {
         dead=true;
-        //        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
-        //        body->SetLinearVelocity(b2Vec2(0,0));
-        //        body->SetType(b2_staticBody);
+        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
+        body->SetLinearVelocity(b2Vec2(0,0));
+        body->SetType(b2_staticBody);
+        lives = 0;
     } else if(lives > 1) {
         //        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
         //        body->SetLinearVelocity(b2Vec2(velocityX,0));
@@ -184,5 +193,9 @@ string Cloud::getGameEntityType() {
 //    return gEntityType;
     return "I'm a Cloud";
 
+}
+
+int Cloud::getLives() {
+    return this->lives;
 }
 
