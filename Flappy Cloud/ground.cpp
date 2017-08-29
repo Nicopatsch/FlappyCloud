@@ -15,6 +15,7 @@ Ground::Ground(b2World& world, float X, float blockLength) {
     shape.SetAsBox((blockLength/2)/SCALE, (16.f/2)/SCALE);
     fixtureDef.density = 0.f;
     fixtureDef.friction = 1.f;
+    fixtureDef.restitution = 1;
     fixtureDef.shape = &shape;
     body->CreateFixture(&fixtureDef);
     groundTexture.loadFromFile(resourcePath() + "ground.png");

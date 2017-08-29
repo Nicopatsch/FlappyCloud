@@ -53,18 +53,16 @@ float Cloud::getPositionY() {
 
 /*Enlève une vie ou tue le nuage*/
 void Cloud::damage() {
-    if (!inCollision){
-        if(lives==1) {
-            dead=true;
-            //        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
-            //        body->SetLinearVelocity(b2Vec2(0,0));
-            //        body->SetType(b2_staticBody);
-        } else if(lives > 1) {
-            //        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
-            //        body->SetLinearVelocity(b2Vec2(velocityX,0));
-            sfCircles.pop_back();
-            lives--;
-        }
+    if(lives==1) {
+        dead=true;
+        //        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
+        //        body->SetLinearVelocity(b2Vec2(0,0));
+        //        body->SetType(b2_staticBody);
+    } else if(lives > 1) {
+        //        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
+        //        body->SetLinearVelocity(b2Vec2(velocityX,0));
+        sfCircles.pop_back();
+        lives--;
     }
 }
 
@@ -80,7 +78,10 @@ bool Cloud::isDead() {
 
 bool Cloud::checkCollision() {
     for (b2ContactEdge* edge = body->GetContactList(); edge; edge = edge->next) {
-        this->damage();
+        
+        if (!inCollision){
+            this->damage();
+        }
         inCollision = true;
         return true;
     }

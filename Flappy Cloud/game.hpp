@@ -42,7 +42,7 @@ private:
     float stormVelocityY; // Storm objects vertical velocity (moving obstacles)
     float epsilon;
     
-    
+    float timeStep;
     
     Cloud cloud;
     b2Vec2 gravity;
@@ -61,7 +61,6 @@ private:
     
 public:
     Game();
-    float timeStep;
     
     void setStep(sf::Time elapsed);
     
@@ -94,6 +93,9 @@ public:
     bool setStarted(bool b);
     
     pair<float, float> getCloudPosition();
+    
+    float getTimeStep();
+
 };
 
 #endif /* game_hpp */

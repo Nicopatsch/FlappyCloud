@@ -204,3 +204,8 @@ bool Game::getStarted() {
 bool Game::setStarted(bool b) {
     started=b;
 }
+
+float Game::getTimeStep() {
+    return timeStep;
+}
+

@@ -37,7 +37,7 @@ int main(int, char const**)
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
     sf::View view(sf::FloatRect(0, 0, 800, 600));
-    window.setFramerateLimit(1/game.timeStep);
+    window.setFramerateLimit(1/game.getTimeStep());
     window.setView(view);
 
 
