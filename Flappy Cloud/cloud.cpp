@@ -24,6 +24,7 @@ Cloud::Cloud(b2World& world, float velocityX, float velocityY, float scoreCoeff)
     body->SetLinearVelocity(b2Vec2(velocityX, 0));
     
     newCircle(0, 0);
+    circles.push_back(pair<int, int>(0,0));
     
     dead = false;
     lives = 1;
@@ -73,6 +74,12 @@ void Cloud::damage() {
         //        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
         //        body->SetLinearVelocity(b2Vec2(velocityX,0));
         sfCircles.pop_back();
+        b2Fixture fixtureList = *body->GetFixtureList();
+        while(fixtureList.GetNext()) {
+            fixtureList = *fixtureList.GetNext();
+            cout << &fixtureList << endl;
+        }
+        fixtureList.~b2Fixture();
         lives--;
     }
 }
@@ -120,6 +127,8 @@ void Cloud::newCircle(float X, float Y) {
     pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
     sfCircles.push_back(circle);
     
+    circles.push_back(pair<int, int>(X,Y));
+    
     lives++;
     
 }
@@ -133,10 +142,10 @@ void Cloud::saveCloudConfiguration() {
     clouds.append_child("CloudConfiguration");
     clouds.last_child().append_attribute("type").set_value("custom");
     
-    for (auto c=sfCircles.begin() ; c<sfCircles.end() ; c++) {
+    for (auto c=circles.begin() ; c<circles.end() ; c++) {
         clouds.last_child().append_child("Center");
-        clouds.last_child().last_child().append_attribute("X").set_value(to_string(c->second.first).c_str());
-        clouds.last_child().last_child().append_attribute("Y").set_value(to_string(c->second.second).c_str());
+        clouds.last_child().last_child().append_attribute("X").set_value(to_string(c->first).c_str());
+        clouds.last_child().last_child().append_attribute("Y").set_value(to_string(c->second).c_str());
     }
     
     doc.save_file("saved.xml");
@@ -157,6 +166,7 @@ void Cloud::loadCloudConfiguration(string name) {
     pair<float, float> coordinates;
     for (pugi::xml_node center: cloudConfig.children()) {
         this->newCircle(stof(center.attribute("X").value()), stof(center.attribute("Y").value()));
+        circles.push_back(pair<int, int>(stof(center.attribute("X").value()),stof(center.attribute("Y").value())));
     }
     
     doc.save_file("saved.xml");
@@ -186,7 +196,6 @@ bool Cloud::checkValidCircle(float X, float Y) {
     cout << "new circle not too far: " << valid1 << endl;
     cout << "new circle not too close: " << valid2 << endl;
     return (valid1 && valid2);
-    //return false;
 }
 
 string Cloud::getGameEntityType() {
@@ -197,5 +206,24 @@ string Cloud::getGameEntityType() {
 
 int Cloud::getLives() {
     return this->lives;
+}
+
+bool Cloud::addLife() {
+    if (lives<10) {
+        if (circles[lives].first!=0 || circles[lives].second!=0) {
+            /*Création du cercle Box2D*/
+            b2CircleShape circleShape;
+            circleShape.m_p.Set(circles[lives].first, circles[lives].second); //position, relative to body position
+            circleShape.m_radius = circleRadius;
+            body->CreateFixture(&circleShape, 1);
+            /*Création du cercle SFML*/
+            pair<float, float> coordinates = pair<float, float>(-circles[lives].first, circles[lives].second);
+            sf::CircleShape sfCircleShape;
+            sfCircleShape.setRadius(SCALE*circleRadius);
+            pair<sf::CircleShape, pair<float, float>> circle = pair<sf::CircleShape, pair<float, float>>(sfCircleShape, coordinates);
+            sfCircles.push_back(circle);
+
+        }
+    }
 }
 
