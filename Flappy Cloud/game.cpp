@@ -48,8 +48,8 @@ Game::Game() {
     blockIndex = 0;
     
     /*Initialisation du premier triplet de blocks*/
-    blockPtrs.push_back(make_unique<Block>(*world, -1, stormVelocityY, obstPerBlock, blockLength));
-    blockPtrs.push_back(make_unique<Block>(*world, 0, stormVelocityY, obstPerBlock,blockLength));
+    blockPtrs.push_back(make_unique<Block>(*world, &cloud, -1, stormVelocityY, obstPerBlock, blockLength));
+    blockPtrs.push_back(make_unique<Block>(*world, &cloud, 0, stormVelocityY, obstPerBlock,blockLength));
     
     //Prepare the sfml score text
     if (!font.loadFromFile(resourcePath() + "sansation.ttf")) {
@@ -157,7 +157,7 @@ bool Game::updateBlocks() {
     if(cloud.getPositionX()*SCALE>blockPtrs[1]->getPositionX()) {
         /*Destruction du premier block puis ajout d'un nouveau en fin de vector blockPtrs*/
         blockPtrs.erase(blockPtrs.begin());
-        blockPtrs.push_back(make_unique<Block>(*world, blockIndex+1, stormVelocityY, obstPerBlock, blockLength));
+        blockPtrs.push_back(make_unique<Block>(*world, &cloud, blockIndex+1, stormVelocityY, obstPerBlock, blockLength));
         blockIndex+=1;
     }
     return blockIndex%2==0;//returns true if blockIndex is even
@@ -179,8 +179,8 @@ void Game::restart() {
     blockIndex = 0;
     
     /*Initialisation du premier triplet de blocks*/
-    blockPtrs.push_back(make_unique<Block>(*world, -1, stormVelocityY, obstPerBlock, blockLength));
-    blockPtrs.push_back(make_unique<Block>(*world, 0, stormVelocityY, obstPerBlock, blockLength));
+    blockPtrs.push_back(make_unique<Block>(*world, &cloud, -1, stormVelocityY, obstPerBlock, blockLength));
+    blockPtrs.push_back(make_unique<Block>(*world, &cloud, 0, stormVelocityY, obstPerBlock, blockLength));
     started = false;
 
 }
