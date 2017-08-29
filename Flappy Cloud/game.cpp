@@ -62,18 +62,18 @@ Game::Game() {
     sfPause = sf::Text("Pause", font, 50);
     sfPause.setFillColor(sf::Color::White);
     
-    sfLives = sf::Text(to_string(cloud.getLives()), font, 30);
+    sfLives = sf::Text(to_string(cloud.getLives()), font, 50);
     sfLives.setFillColor(sf::Color::White);
     
     heartTextures = vector<sf::Texture>();
     for(int i=0 ; i<5 ; i++) {
         heartTextures.push_back(sf::Texture());
     }
-    heartTextures[0].loadFromFile(resourcePath() + "heart1.png");
-    heartTextures[1].loadFromFile(resourcePath() + "heart2.png");
-    heartTextures[2].loadFromFile(resourcePath() + "heart3.png");
-    heartTextures[3].loadFromFile(resourcePath() + "heart4.png");
-    heartTextures[4].loadFromFile(resourcePath() + "heart5.png");
+    heartTextures[0].loadFromFile(resourcePath() + "heart0.png");
+    heartTextures[1].loadFromFile(resourcePath() + "heart1.png");
+    heartTextures[2].loadFromFile(resourcePath() + "heart2.png");
+    heartTextures[3].loadFromFile(resourcePath() + "heart3.png");
+    heartTextures[4].loadFromFile(resourcePath() + "heart4.png");
     
     cout << "New game built" << endl;
     
@@ -121,7 +121,12 @@ void Game::draw(sf::RenderWindow& window) {
     string livesText = to_string(cloud.getLives());
     sfLives.setString(livesText);
     sfLives.setPosition((cloud.getPositionX())*SCALE-200, 40);
-    heart.setSize(sf::Vector2f(118, 89));
+    heartSprite.setTexture(heartTextures[(cloud.getLives()!=0) * (ceil(((cloud.getLives())-1)/3)+1)]);
+    heartSprite.setOrigin(0,0);
+    heartSprite.setPosition(cloud.getPositionX() * SCALE-280, 45);
+    heartSprite.setScale(.5, .5);
+
+    window.draw(heartSprite);
     window.draw(sfLives);
 }
 

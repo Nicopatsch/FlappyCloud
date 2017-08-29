@@ -41,6 +41,7 @@ private:
     float scoreCoeff;
     
     vector<pair<sf::CircleShape, pair<float, float>>> sfCircles; //vecteur dont chaque élement est une paire contenant first-le sf::CircleShape et en second une paire de coordonnées
+    vector<pair<int, int>> circles; //Les coordonnées des cercles
 public:
     Cloud(b2World& world, float velocityX, float velocityY, float scoreCoeff);
     Cloud();
@@ -57,6 +58,7 @@ public:
     void loadCloudConfiguration(string name);
     bool checkValidCircle(float X, float Y);
     int getLives();
+    bool addLife();
 
     string getGameEntityType();
 };

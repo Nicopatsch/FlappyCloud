@@ -64,7 +64,6 @@ private:
     
     //Pour l'affichage du nombre de vies
     sf::Text sfLives;
-    sf::RectangleShape heart;
     sf::Sprite heartSprite;
     vector<sf::Texture> heartTextures;
     
