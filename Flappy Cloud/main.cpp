@@ -65,8 +65,9 @@ int main(int, char const**)
             }
 
             if (event.type == sf::Event::MouseButtonPressed) {
-                game.newCircle((event.mouseButton.x - 300)/SCALE, (event.mouseButton.y - game.getCloudPosition().second*SCALE)/SCALE);
-                
+                if (!game.getStarted()) {
+                    game.newCircle((event.mouseButton.x - 300)/SCALE, (event.mouseButton.y - game.getCloudPosition().second*SCALE)/SCALE);
+                }
             }
             
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {

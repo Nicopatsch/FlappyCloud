@@ -17,7 +17,7 @@ Cloud::Cloud(b2World& world, float velocityX, float velocityY, float scoreCoeff)
     /*Création du body Box2D*/
     bodyDef.position = b2Vec2((-1000)/SCALE, 200/SCALE);
     bodyDef.type = b2_dynamicBody;
-    bodyDef.fixedRotation =true;
+    bodyDef.fixedRotation = true;
     body = world.CreateBody(&bodyDef);
     body->SetLinearVelocity(b2Vec2(velocityX, 0));
     
@@ -53,16 +53,18 @@ float Cloud::getPositionY() {
 
 /*Enlève une vie ou tue le nuage*/
 void Cloud::damage() {
-    if(lives==1) {
-        dead=true;
-//        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
-//        body->SetLinearVelocity(b2Vec2(0,0));
-//        body->SetType(b2_staticBody);
-    } else if(lives > 1) {
-//        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
-//        body->SetLinearVelocity(b2Vec2(velocityX,0));
-        sfCircles.pop_back();
-        lives--;
+    if (!inCollision){
+        if(lives==1) {
+            dead=true;
+            //        body->SetTransform(b2Vec2(body->GetPosition().x, body->GetPosition().y), 0);
+            //        body->SetLinearVelocity(b2Vec2(0,0));
+            //        body->SetType(b2_staticBody);
+        } else if(lives > 1) {
+            //        body->SetTransform(b2Vec2(body->GetPosition().x+10., 200./SCALE), 0);
+            //        body->SetLinearVelocity(b2Vec2(velocityX,0));
+            sfCircles.pop_back();
+            lives--;
+        }
     }
 }
 
@@ -79,10 +81,12 @@ bool Cloud::isDead() {
 bool Cloud::checkCollision() {
     for (b2ContactEdge* edge = body->GetContactList(); edge; edge = edge->next) {
         this->damage();
+        inCollision = true;
         return true;
     }
-
+    inCollision = false;
     return false;
+
 //    if (body->GetLinearVelocity().x < velocityX) {
 //        this->kill();
 //        return true;

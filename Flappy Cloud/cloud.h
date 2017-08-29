@@ -32,7 +32,7 @@ private:
     b2BodyDef bodyDef;
     b2Body* body;
     sf::Sprite sprite;
-    bool bouncingBack;
+    bool inCollision; // lorsque body rentre en contact avec un autre body, le contact peut durer plusieurs frames. Ce booléen inCollision sera VRAI lorsqu'il y aura eu contact à la dernière frame afin de permettre d'éviter que le Cloud perde plusieurs vies pour une même collision.
     bool dead;
     int lives;
 //    int compteur;
