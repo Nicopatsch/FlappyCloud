@@ -20,6 +20,10 @@
 #include "tornado.hpp"
 #include "ground.hpp"
 #include "ceilling.hpp"
+#include "cloud.h"
+#include "rainbow.hpp"
+#include "basic_functions.h"
+
 
 
 class Block {
@@ -29,10 +33,11 @@ private:
     vector<Tornado> tornadoes = vector<Tornado>();
     Ground ground;
     Ceilling ceilling;
+    Rainbow rainbow;
     int obstPerBlock;
     float blockLength;
 public:
-    Block(b2World& world, int N, float stormVY, int obstPerBlock, float blockLength);
+    Block(b2World& world, Cloud* cloud, int N, float stormVY, int obstPerBlock, float blockLength);
     
     Block();
     

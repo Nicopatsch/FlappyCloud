@@ -6,11 +6,12 @@
 #include "block.hpp"
 
 
-Block::Block(b2World& world, int N, float stormVY, int obstPerBlock, float blockLength){
+Block::Block(b2World& world, Cloud* cloud, int N, float stormVY, int obstPerBlock, float blockLength){
     if(N!=-1){
         for (int i=0 ; i<obstPerBlock ; i++) {
             storms.push_back(Storm(world, N*blockLength+i*blockLength/obstPerBlock, 100, stormVY)); //Storms espacés de 1000m
             tornadoes.push_back(Tornado(world, N*blockLength+(i+0.5)*blockLength/obstPerBlock, 400));
+            rainbow=Rainbow(world, cloud, N*blockLength+i*0.75*blockLength/obstPerBlock, 200);
         }
     }
     this->blockLength = blockLength;
@@ -23,6 +24,7 @@ Block::Block(b2World& world, int N, float stormVY, int obstPerBlock, float block
 }
 
 Block::Block() {
+    Rainbow r = Rainbow();
     cout<<"Block "<<N<<" créé"<<endl;
 }
 
@@ -42,6 +44,8 @@ void Block::draw(sf::RenderWindow& window) {
     for (auto tor = tornadoes.begin() ; tor<tornadoes.end(); tor++) {
         tor->draw(window);
     }
+    rainbow.draw(window);
+    
     ceilling.draw(window);
 }
 

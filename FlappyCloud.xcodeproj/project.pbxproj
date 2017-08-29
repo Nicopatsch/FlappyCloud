@@ -100,7 +100,7 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 16;
+			dstSubfolderSpec = 7;
 			files = (
 				4562CCC71F55B314001C35F2 /* saved.xml in CopyFiles */,
 				4562CCC81F55B314001C35F2 /* saved.xml in CopyFiles */,
